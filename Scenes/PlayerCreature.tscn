@@ -1,0 +1,52 @@
+[gd_scene load_steps=2 format=3 uid="uid://rdcx2h1pbtv4"]
+
+[ext_resource type="Script" uid="uid://tnvkopjfhy2n" path="res://Scripts/player_creature.gd" id="1_bp8py"]
+
+[node name="PlayerCreature" type="Control"]
+custom_minimum_size = Vector2(100, 100)
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_bp8py")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.44621366, 0.025724202, 0.42713442, 1)
+
+[node name="StatBox" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -50.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="LabelContainer" type="HBoxContainer" parent="StatBox"]
+layout_mode = 2
+
+[node name="HPLabel" type="Label" parent="StatBox/LabelContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.21268043, 0.15969583, 1)
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PlayerNameLabel" type="Label" parent="StatBox/LabelContainer"]
+layout_mode = 2
+text = "The Scarred"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BlockLabel" type="Label" parent="StatBox/LabelContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.13662028, 0.37203416, 1, 1)
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="EffectsContainer" type="HBoxContainer" parent="StatBox"]
+layout_mode = 2

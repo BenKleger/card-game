@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=5 format=3 uid="uid://blrq8pw16nkvj"]
+
+[ext_resource type="Script" uid="uid://cnr8oadj8l1w5" path="res://Resources/ResourceClasses/enemy_move.gd" id="1_kwns0"]
+[ext_resource type="Resource" uid="uid://coepslvarpju1" path="res://data/enemy_moves/first_enemy_move.tres" id="2_0g4bk"]
+[ext_resource type="Resource" uid="uid://bibsdei2yc0a1" path="res://data/enemy_moves/second_enemy_move.tres" id="3_86o5u"]
+[ext_resource type="Script" uid="uid://cpfiqg83uyh0q" path="res://Resources/ResourceClasses/enemy_data.gd" id="4_gc4nr"]
+
+[resource]
+script = ExtResource("4_gc4nr")
+name = "Heh Bob"
+base_hp = 5
+starting_moves = Array[ExtResource("1_kwns0")]([ExtResource("2_0g4bk"), ExtResource("3_86o5u")])
+move_pool_loop = Array[ExtResource("1_kwns0")]([ExtResource("2_0g4bk"), ExtResource("3_86o5u"), ExtResource("3_86o5u")])

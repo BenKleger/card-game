@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="MapNode" load_steps=5 format=3 uid="uid://g6dskgn0dtqe"]
+
+[ext_resource type="Script" uid="uid://cpfiqg83uyh0q" path="res://Resources/ResourceClasses/enemy_data.gd" id="1_ekcsc"]
+[ext_resource type="Script" uid="uid://dks5ebshtp37r" path="res://Resources/ResourceClasses/encounter_data.gd" id="2_hf7ml"]
+[ext_resource type="Script" uid="uid://bjmljuj8iss4o" path="res://Resources/ResourceClasses/map_node.gd" id="3_m5idn"]
+
+[sub_resource type="Resource" id="Resource_iwlt8"]
+script = ExtResource("2_hf7ml")
+metadata/_custom_type_script = "uid://dks5ebshtp37r"
+
+[resource]
+script = ExtResource("3_m5idn")
+grid_position = Vector2i(1, 1)
+encounter = SubResource("Resource_iwlt8")

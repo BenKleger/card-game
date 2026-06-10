@@ -1,0 +1,52 @@
+[gd_scene load_steps=2 format=3 uid="uid://bl2puy5hyatrl"]
+
+[ext_resource type="Script" uid="uid://cn8cwdut3ctwv" path="res://Scripts/escape_menu.gd" id="1_iqg4d"]
+
+[node name="EscapeMenu" type="CanvasLayer"]
+layer = 30
+script = ExtResource("1_iqg4d")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+anchors_preset = -1
+anchor_left = 0.15
+anchor_top = 0.1
+anchor_right = 0.9
+anchor_bottom = 0.75
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="EscapeMenuLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 5
+size_flags_vertical = 6
+text = "Escape Menu"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ResumeButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Resume"
+
+[node name="SettingsButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 5
+size_flags_vertical = 6
+text = "Settings
+TODO"
+
+[node name="ExitRunButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 5
+size_flags_vertical = 6
+text = "Exit Run"
+
+[node name="AbandonRunButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 5
+size_flags_vertical = 6
+text = "Abandon Run"
+
+[connection signal="pressed" from="VBoxContainer/ResumeButton" to="." method="_on_resume_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/SettingsButton" to="." method="_on_settings_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/ExitRunButton" to="." method="_on_exit_run_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/AbandonRunButton" to="." method="_on_abandon_run_button_pressed"]

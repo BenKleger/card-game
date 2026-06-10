@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://bmqe1lab61ryu"]
+
+[ext_resource type="Script" uid="uid://cgm0lo8oplise" path="res://Autoloaded/RunState.gd" id="1_pvkkf"]
+
+[node name="RunState" type="Node"]
+script = ExtResource("1_pvkkf")

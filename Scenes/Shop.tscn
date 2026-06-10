@@ -1,0 +1,70 @@
+[gd_scene load_steps=2 format=3 uid="uid://df3ecqvtjkfbr"]
+
+[ext_resource type="Script" uid="uid://r6dk7841oh6c" path="res://Scripts/shop.gd" id="1_kjfcx"]
+
+[node name="Shop" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_kjfcx")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -576.0
+offset_right = 576.0
+offset_bottom = 213.0
+grow_horizontal = 2
+size_flags_vertical = 7
+text = "Shop"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ShopVBC" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ShopAreaNode" type="Control" parent="ShopVBC"]
+layout_mode = 2
+size_flags_vertical = 7
+
+[node name="ShopAreaHBC" type="HBoxContainer" parent="ShopVBC/ShopAreaNode"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="ItemVBC" type="VBoxContainer" parent="ShopVBC/ShopAreaNode/ShopAreaHBC"]
+layout_mode = 2
+size_flags_horizontal = 7
+size_flags_vertical = 5
+
+[node name="ItemVBC2" type="VBoxContainer" parent="ShopVBC/ShopAreaNode/ShopAreaHBC"]
+layout_mode = 2
+size_flags_horizontal = 7
+size_flags_vertical = 5
+
+[node name="ItemVBC3" type="VBoxContainer" parent="ShopVBC/ShopAreaNode/ShopAreaHBC"]
+layout_mode = 2
+size_flags_horizontal = 7
+size_flags_vertical = 5
+
+[node name="ItemVBC4" type="VBoxContainer" parent="ShopVBC/ShopAreaNode/ShopAreaHBC"]
+layout_mode = 2
+size_flags_horizontal = 7
+size_flags_vertical = 5
+
+[node name="continue" type="Button" parent="ShopVBC"]
+layout_mode = 2
+size_flags_vertical = 7
+text = "Continue"
+
+[connection signal="pressed" from="ShopVBC/continue" to="." method="_on_continue_pressed"]

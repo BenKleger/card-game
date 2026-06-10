@@ -1,0 +1,9 @@
+# GlobalEnums.gd — add to autoload as "GlobalEnums"
+extends Node
+
+enum ProcOn { TURN_START, TURN_END, ON_SHIELD_DAMAGED, ON_HP_DAMAGED, ON_CARD_PLAYED, ON_ATTACK, START_COMBAT }
+enum CardType { TEMPORARY, PERMANENT, FIELD }
+enum CardColor { RED, BLUE, GREEN, PURPLE }
+enum IntentType { ATTACK, BLOCK, DEBUFF, BUFF, SUMMON }
+enum MapNodeType { SHOP, COMBAT, ELITE, BOSS, LORE, REST }
+enum CardRarity { COMMON, RARE, LEGENDARY }

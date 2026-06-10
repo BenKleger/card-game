@@ -1,0 +1,59 @@
+[gd_scene load_steps=2 format=3 uid="uid://vnshjtbms4e5"]
+
+[ext_resource type="Script" uid="uid://bg8qr2xtwvume" path="res://Scripts/summon_creature.gd" id="1_6x2gg"]
+
+[node name="SummonCreature" type="Control"]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_6x2gg")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.37170994, 9.907715e-05, 0.3742164, 1)
+
+[node name="StatBox" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -50.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="LabelContainer" type="HBoxContainer" parent="StatBox"]
+layout_mode = 2
+
+[node name="HPLabel" type="Label" parent="StatBox/LabelContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.21268043, 0.15969583, 1)
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="NameLabel" type="Label" parent="StatBox/LabelContainer"]
+layout_mode = 2
+text = "The Scarred"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BlockLabel" type="Label" parent="StatBox/LabelContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.13662028, 0.37203416, 1, 1)
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DescriptionLabel" type="Label" parent="StatBox"]
+layout_mode = 2
+
+[node name="EffectsContainer" type="HBoxContainer" parent="StatBox"]
+layout_mode = 2
