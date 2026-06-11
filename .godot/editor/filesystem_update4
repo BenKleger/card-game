@@ -1,0 +1,9 @@
+res://Scripts/combat_manager.gd
+res://Scenes/CombatManager.tscn
+res://Scripts/deck_manager.gd
+res://Scenes/SummonCreature.tscn
+res://Autoloaded/CardLibrary.gd
+res://Resources/ResourceClasses/card_data.gd
+res://Scenes/PlayerCreature.tscn
+res://Scripts/player_creature.gd
+res://Scripts/CombatEffects.gd

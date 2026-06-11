@@ -21,6 +21,11 @@ extends Resource
 @export var energy_gain: int = 0
 @export var coin_value: int = 0
 @export var coin_gain: int = 0
+#TODO CARDACTION Introduce a proper CardAction system; or just action in general tbh
+#Each card becomes a list of actions
+#Actions determine their own target groups
+enum TargetType { NONE, SINGLE_ENEMY, ALL_ENEMIES, SELF, SINGLE_ALLY, ALL_ALLIES }
+@export var target_type: TargetType
 
 #upgrade values
 @export var damage_upgrade:int = 0
@@ -36,6 +41,7 @@ extends Resource
 @export var summon_hp: int = 0
 @export var takes_aggro: bool = false
 @export var is_passive: bool = false
+@export var can_target_summons : bool = true
 
 func get_energy_cost()->int:
 	return max(0, energy_cost - energy_cost_upgrade*upgrade_level)
@@ -43,6 +49,9 @@ func get_energy_cost()->int:
 func get_coin_cost()->int:
 	return max(0, coin_value - coin_value_upgrade*upgrade_level)
 	
+func get_coin_gain()->int:
+	return coin_gain + coin_gain_upgrade*upgrade_level
+
 func get_damage()->int:
 	return damage+damage_upgrade*upgrade_level
 	
@@ -86,8 +95,6 @@ func get_description() -> String: #TODO OOO
 func update_display():
 	pass
 
-enum TargetType { NONE, SINGLE_ENEMY, ALL_ENEMIES, SELF }
-@export var target_type: TargetType
 
 @export var max_upgrades: int = 1
 var upgrade_level: int = 0

@@ -13,6 +13,12 @@ func get_cards_by_color(color: GlobalEnums.CardColor) -> Array[CardData]:
 	return all_cards.filter(func(c): return c.color == color)
 
 func _build_cards() -> void:
+	all_cards.append(_card("Rabid Hound", 1, GlobalEnums.CardColor.RED, GlobalEnums.CardRarity.COMMON,
+		CardData.TargetType.SINGLE_ENEMY, 4, 0, 0, 0, 0, [], GlobalEnums.CardType.FIELD, 5, true, false))
+	all_cards.append(_card("Shitty", 1, GlobalEnums.CardColor.RED, GlobalEnums.CardRarity.COMMON,
+		CardData.TargetType.SINGLE_ALLY , 0, 5, 0, 0, 0, [], GlobalEnums.CardType.FIELD, 5, false, true))
+	
+	
 	# --- Colorless — starter cards, available to all ---
 	all_cards.append(_card("Defend", 1, GlobalEnums.CardColor.BLUE, GlobalEnums.CardRarity.COMMON,
 		CardData.TargetType.SELF, 0, 5, 0, 0, 0, []))
@@ -107,8 +113,6 @@ func _build_cards() -> void:
 		CardData.TargetType.ALL_ENEMIES, 8, 0, 0, 0, 0, [_vulnerable(3), _weak(3)]))
 
 	# --- FIELD CARDS: AGGRESSIVE (RED) ---
-	all_cards.append(_card("Rabid Hound", 1, GlobalEnums.CardColor.RED, GlobalEnums.CardRarity.COMMON,
-		CardData.TargetType.SINGLE_ENEMY, 4, 0, 0, 0, 0, [], GlobalEnums.CardType.FIELD))
 
 	all_cards.append(_card("Flagellant", 2, GlobalEnums.CardColor.RED, GlobalEnums.CardRarity.COMMON,
 		CardData.TargetType.SINGLE_ENEMY, 6, 0, 0, 0, 0, [_bleed(1)], GlobalEnums.CardType.FIELD))

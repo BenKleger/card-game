@@ -70,14 +70,25 @@ layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 2
 
+[node name="PassiveColumn" type="VBoxContainer" parent="UI/UIHeirarchy/BattleAreaNode/BattleArea/PlayerArea"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
 [node name="PlayerCreature" parent="UI/UIHeirarchy/BattleAreaNode/BattleArea/PlayerArea" instance=ExtResource("3_f5ypw")]
 layout_mode = 2
 size_flags_horizontal = 6
 size_flags_vertical = 4
 
-[node name="SummonContainer" type="GridContainer" parent="UI/UIHeirarchy/BattleAreaNode/BattleArea/PlayerArea"]
+[node name="NeutralColumn" type="VBoxContainer" parent="UI/UIHeirarchy/BattleAreaNode/BattleArea/PlayerArea"]
 layout_mode = 2
 size_flags_horizontal = 3
+alignment = 1
+
+[node name="TankColumn" type="VBoxContainer" parent="UI/UIHeirarchy/BattleAreaNode/BattleArea/PlayerArea"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
 
 [node name="EnemyArea" type="HBoxContainer" parent="UI/UIHeirarchy/BattleAreaNode/BattleArea"]
 layout_mode = 2
@@ -121,7 +132,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 2
 
-[node name="ExhautButton" type="Button" parent="UI/UIHeirarchy/BottomBarNode/BottomBar"]
+[node name="ExhaustButton" type="Button" parent="UI/UIHeirarchy/BottomBarNode/BottomBar"]
 layout_mode = 2
 text = "Exhaust Pile"
 
@@ -144,6 +155,6 @@ size_flags_horizontal = 8
 text = "End Turn"
 
 [connection signal="pressed" from="UI/UIHeirarchy/BottomBarNode/BottomBar/DrawButton" to="." method="_on_draw_button_pressed"]
-[connection signal="pressed" from="UI/UIHeirarchy/BottomBarNode/BottomBar/ExhautButton" to="." method="_on_exhaut_button_pressed"]
+[connection signal="pressed" from="UI/UIHeirarchy/BottomBarNode/BottomBar/ExhaustButton" to="." method="_on_exhaust_button_pressed"]
 [connection signal="pressed" from="UI/UIHeirarchy/BottomBarNode/BottomBar/DiscardButton" to="." method="_on_discard_button_pressed"]
 [connection signal="pressed" from="UI/UIHeirarchy/BottomBarNode/BottomBar/EndTurnButton" to="." method="end_turn"]

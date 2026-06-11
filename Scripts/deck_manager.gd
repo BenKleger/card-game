@@ -3,9 +3,9 @@ extends Node
 
 var draw_pile: Array[CardData] = []
 var discard_pile: Array[CardData] = []
+var exhaust_pile: Array[CardData] = []
 var hand: Array[CardData] = []
 var summons: Array[CardData] = []
-var exhaust_pile: Array[CardData] = []
 
 func initialize(deck: Array[CardData]) -> void:
 	draw_pile = []
@@ -21,6 +21,9 @@ func get_draw_count() -> int:
 	
 func get_discard_count() -> int:
 	return discard_pile.size()
+
+func get_exhaust_count() -> int:
+	return exhaust_pile.size()
 
 func draw(n: int) -> Array[CardData]:
 	var drawn: Array[CardData] = []

@@ -8,6 +8,14 @@ var energy: int
 var max_energy: int = RunState.max_energy
 var effects: Array[Effect]
 
+signal clicked(player: PlayerCreature)
+
+func _gui_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton \
+	and event.button_index == MOUSE_BUTTON_LEFT \
+	and event.pressed:
+		clicked.emit(self)
+
 @onready var effects_container: HBoxContainer = $StatBox/EffectsContainer
 
 	

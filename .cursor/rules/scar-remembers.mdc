@@ -1,0 +1,39 @@
+---
+description: The Scar Remembers — core project context, priorities, and working style
+alwaysApply: true
+---
+
+# The Scar Remembers
+
+Dark grimdark card roguelite (STS-inspired, differentiated). **Godot 4 + GDScript**. Goal: vertical slice on itch.io.
+
+## Conventions
+
+- Tabs for indentation
+- PascalCase for scenes, camelCase for variables
+- Autoload order: GlobalConstants → GlobalEnums → RunState → CardLibrary → EncounterLibrary → RelicLibrary
+
+## Working with Ben
+
+- Strong ideator; struggles with initiation and follow-through — help break work into small, startable steps
+- **Call out scope creep firmly** — do not expand scope unless asked
+- No validation-seeking; give direct, honest feedback
+- Backburner (do not touch): YouTime, IWantThat, snowboard sensors, Warhammer layer, thread counter, gifting platform
+
+## Current priorities (in order)
+
+1. Enemy targeting priority — aggro rules (tank → non-passive → passive → player)
+2. Summon layout — 3 columns (Tank | Aggressive | Passive), max capacity per column
+3. Summon death → card returns to discard
+4. SELF cards optionally target summons
+5. Combat manager — summons tick bleed/regen each turn
+
+## Key differentiators
+
+- Summon/Field card system (persistent creatures with HP pools)
+- Time rewind mechanic (NOT YET BUILT) — the main differentiator
+- Color synergy tied to factions (BLOCKED on Zac's faction names)
+
+## Deep reference
+
+For full architecture (RunState, CombatManager, CardData, libraries, scenes, TODOs), read `.cursor/skills/the-scar-remembers/reference.md` or invoke the `the-scar-remembers` skill.

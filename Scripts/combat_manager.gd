@@ -8,6 +8,10 @@ enum Phase{PLAYER_TURN_START,PLAYER_TURN,PLAYER_TURN_END,END_COMBAT}
 
 var hand_size_modifier: int = 0 #TODO Unused
 var card_draw_modifier: int = 0
+var summon_slot_modifier: int = 0
+
+enum SummonColumn { PASSIVE, NEUTRAL, TANK }
+const BASE_SUMMON_SLOTS_PER_COLUMN: int = 3
 var enemies: Array[EnemyCreature]
 var combat_seed: int
 const ENEMY_SCENE = preload("res://scenes/EnemyCreature.tscn")
@@ -18,9 +22,13 @@ var turn_number: int = 1
 var selected_card: CardData = null
 var phase: Phase = Phase.PLAYER_TURN_START
 
-@onready var summon_container: GridContainer = $UI/UIHeirarchy/BattleAreaNode/BattleArea/PlayerArea/SummonContainer
+@onready var passive_column: VBoxContainer = $UI/UIHeirarchy/BattleAreaNode/BattleArea/PlayerArea/PassiveColumn
+@onready var neutral_column: VBoxContainer = $UI/UIHeirarchy/BattleAreaNode/BattleArea/PlayerArea/NeutralColumn
+@onready var tank_column: VBoxContainer = $UI/UIHeirarchy/BattleAreaNode/BattleArea/PlayerArea/TankColumn
 const SUMMON_SCENE = preload("res://Scenes/SummonCreature.tscn")
 var summons: Array[SummonCreature] = []
+
+var selected_summon: SummonCreature = null
 
 func _ready() -> void:
 	
@@ -29,7 +37,7 @@ func _ready() -> void:
 	player.current_hp = RunState.current_hp
 	player.max_hp = RunState.max_hp
 	player.energy = RunState.max_energy
-	_update_player_ui()
+	update_player_ui()
 	
 	# setup deck
 	deck_manager.initialize(RunState.deck)
@@ -51,28 +59,17 @@ func _ready() -> void:
 	advance_phase()
 
 func _start_of_combat_player() -> void:
-	_proc_effects(player, GlobalEnums.ProcOn.START_COMBAT)
+	CombatEffects.proc_effects(player, GlobalEnums.ProcOn.START_COMBAT)
 	# Apply relic effects at combat start
 	for relic in RunState.relics:
 		for effect in relic.start_combat_effects:
-			apply_effect(effect.duplicate(), player)
+			CombatEffects.apply_effect(effect.duplicate(), player)
 
 func _start_of_combat_enemy() -> void:
 	for enemy in enemies:
-		_proc_effects(enemy, GlobalEnums.ProcOn.START_COMBAT)
+		CombatEffects.      proc_effects(enemy, GlobalEnums.ProcOn.START_COMBAT)
 		_display_enemy_intent(turn_number - 1, enemy)
 
-func apply_effect(effect: Effect, target: Node) -> void:
-	# Check if effect of same type already exists — add stacks
-	for existing in target.effects:
-		if existing.get_script() == effect.get_script():
-			existing.stacks += effect.stacks
-			return
-	# Otherwise add fresh
-	var new_effect = effect.duplicate()
-	target.effects.append(new_effect)
-	new_effect.on_applied(target)
-	check_death(target)
 
 @onready var enemy_area = $UI/UIHeirarchy/BattleAreaNode/BattleArea/EnemyArea
 func _spawn_enemies() -> void:
@@ -91,16 +88,6 @@ func _spawn_enemies() -> void:
 
 		enemies.append(enemy)
 
-func _on_deck_button_pressed() -> void:
-	RunState.open_deck_viewer(self, RunState.deck, "Deck")
-func _on_discard_button_pressed() -> void:
-	#Visualize discard pile
-	RunState.open_deck_viewer(self, deck_manager.discard_pile, "Discard Pile")
-
-func _on_draw_button_pressed() -> void:
-	#Visualize draw pile
-	RunState.open_deck_viewer(self, deck_manager.draw_pile, "Draw Pile")
-
 func _on_card_clicked(card: CardData) -> void:
 	# reset all cards to original position first
 	_reset_card_positions()
@@ -115,9 +102,26 @@ func _connect_signals() -> void:
 		end_turn_button.pressed.connect(end_turn)
 	for enemy in enemies:
 		enemy.clicked.connect(_on_enemy_clicked)
+	player.clicked.connect(_on_player_clicked)
 
+func _on_player_clicked(_player):
+	if selected_card != null:
+		select_target(player)
+	elif selected_summon != null:
+		_execute_summon_action(selected_summon, player)
+		selected_summon = null
+		return
+
+	
+	
 func _on_enemy_clicked(enemy: EnemyCreature) -> void:
+	if selected_summon != null:
+		_execute_summon_action(selected_summon, enemy)
+		selected_summon = null
+		return
+
 	select_target(enemy)
+
 
 func select_card(card: CardData) -> void:
 	if selected_card == card:
@@ -141,15 +145,22 @@ func _raise_selected_card(card: CardData) -> void:
 			child.position.y = -30
 
 func select_target(target: Node = null) -> void:
+	#TODO UNIFY CARD TARGETING
 	if phase != Phase.PLAYER_TURN:
 		# TODO shake cards as not your turn
 		return
 	if selected_card == null:
 		return
 	if selected_card.card_type == GlobalEnums.CardType.FIELD:
-		summon_logic(target)
+		summon_logic()
+		selected_card = null
+		_reset_card_positions()
 		return
 	card_logic(target)
+	selected_card = null
+	selected_summon = null
+	check_death(target)
+	_reset_card_positions()
 
 func card_logic(target: Node) -> void:
 	if player.energy < selected_card.energy_cost:
@@ -159,80 +170,123 @@ func card_logic(target: Node) -> void:
 		CardData.TargetType.NONE:
 			_execute_card(selected_card, null)
 		CardData.TargetType.SELF:
-			_execute_card(selected_card, player)
+			if target is SummonCreature:
+				if not selected_card.can_target_summons:
+					return
+
+				_execute_card(selected_card, target)
+			else:
+				_execute_card(selected_card, player)
+		
 		CardData.TargetType.SINGLE_ENEMY:
 			if target == null or not target is EnemyCreature:
 				return
 			_execute_card(selected_card, target)
 		CardData.TargetType.ALL_ENEMIES:
 			_execute_card(selected_card, null)
+	check_death(target)
 	selected_card = null
 	_reset_card_positions()
 
-func summon_logic(target: Node) -> void:
-	# Spawning a new summon
+func summon_logic() -> void:
 	if player.energy < selected_card.energy_cost:
+		return
+	if not _can_spawn_summon(selected_card):
+		# TODO visual feedback — column full or already in field
+		selected_card = null
+		_reset_card_positions()
 		return
 	spawn_summon(selected_card)
 	selected_card = null
 	_reset_card_positions()
 
+func _get_summon_column_from_data(data: CardData) -> SummonColumn:
+	if data.takes_aggro:
+		return SummonColumn.TANK
+	if data.is_passive:
+		return SummonColumn.PASSIVE
+	return SummonColumn.NEUTRAL
+
+func _get_column_container(column: SummonColumn) -> VBoxContainer:
+	match column:
+		SummonColumn.PASSIVE:
+			return passive_column
+		SummonColumn.NEUTRAL:
+			return neutral_column
+		SummonColumn.TANK:
+			return tank_column
+	return passive_column
+
+func _max_slots_for_column(_column: SummonColumn) -> int:
+	return BASE_SUMMON_SLOTS_PER_COLUMN + summon_slot_modifier
+
+func _get_alive_summons_in_column(column: SummonColumn) -> Array[SummonCreature]:
+	var result: Array[SummonCreature] = []
+	for child in _get_column_container(column).get_children():
+		if child is SummonCreature and child.current_hp > 0:
+			result.append(child)
+	return result
+
+func _get_first_alive_in_column(column: SummonColumn) -> SummonCreature:
+	var alive := _get_alive_summons_in_column(column)
+	if alive.is_empty():
+		return null
+	return alive[0]
+
+func _can_spawn_summon(card_data: CardData) -> bool:
+	if card_data.in_field:
+		return false
+	var column := _get_summon_column_from_data(card_data)
+	return _get_alive_summons_in_column(column).size() < _max_slots_for_column(column)
+
 func spawn_summon(card_data: CardData) -> void:
 	if card_data.card_type != GlobalEnums.CardType.FIELD:
 		return
+	if not _can_spawn_summon(card_data):
+		return
+	var column := _get_summon_column_from_data(card_data)
 	var summon = SUMMON_SCENE.instantiate()
 	summon.uid = CardLibrary.get_next_uid()
-	summon_container.add_child(summon)
+	_get_column_container(column).add_child(summon)
 	summon.setup(card_data)
 	summons.append(summon)
 	deck_manager.summons.append(card_data)
 	card_data.in_field = true
 	player.energy -= card_data.energy_cost
-	deck_manager.discard(card_data)
+	deck_manager.exhaust(card_data)
 	summon.clicked.connect(_on_summon_clicked)
 	_remove_card_from_hand(card_data)
+	update_player_ui()
+
+func _pick_default_enemy_attack_target() -> Node:
+	var tank := _get_first_alive_in_column(SummonColumn.TANK)
+	if tank != null:
+		return tank
+	var neutral := _get_first_alive_in_column(SummonColumn.NEUTRAL)
+	if neutral != null:
+		return neutral
+	if player.current_hp > 0:
+		return player
+	var passive := _get_first_alive_in_column(SummonColumn.PASSIVE)
+	if passive != null:
+		return passive
+	return player
 
 func _on_summon_clicked(summon: SummonCreature) -> void:
-	if phase != Phase.PLAYER_TURN:
+	if selected_card != null:
+		select_target(summon)
 		return
-	if summon.used_this_turn:
-		# TODO visual feedback — shake or flash
+	elif selected_summon != null:
+		_execute_summon_action(selected_summon, summon)
 		return
-	_execute_summon_action(summon)
+	selected_summon = summon 
 
-func _execute_summon_action(summon: SummonCreature) -> void:
-	var card = summon.card_data
-	var targets: Array = []
-	match card.target_type:
-		CardData.TargetType.SINGLE_ENEMY:
-			if enemies.is_empty():
-				return
-			targets = [enemies[0]]  # hits first enemy for now, targeting later
-		CardData.TargetType.ALL_ENEMIES:
-			targets = enemies.duplicate()
-		CardData.TargetType.SELF:
-			targets = [player]
-		CardData.TargetType.NONE:
-			pass
-	
-	for t in targets:
-		if card.damage > 0:
-			_attack_target(card.damage, t, summon)
-		for effect in card.effects:
-			apply_effect(effect.duplicate(), t)
-		t.update_stats()
-	
-	if card.block > 0:
-		player.block += card.block
-	if card.draw > 0:
-		_draw_cards(card.draw)
-	if card.energy_gain > 0:
-		player.energy += card.energy_gain
-	
-	summon.used_this_turn = true
-	summon.modulate = Color(0.5, 0.5, 0.5, 1.0)  # grey out when used
-	_update_player_ui()
-	_update_deck_ui()
+func _is_valid_card_target(target: Node) -> bool:
+	return (
+		target is PlayerCreature
+		or target is EnemyCreature
+		or target is SummonCreature
+	)
 
 func _execute_card(card: CardData, target) -> void:
 	_apply_card_effects(card, target)
@@ -256,15 +310,69 @@ func _remove_card_from_hand(card: CardData) -> void:
 			deck_manager.hand.remove_at(i)
 			break
 	_update_deck_ui()
-	_update_player_ui()
+	update_player_ui()
 
 @onready var draw_button: Button = $UI/UIHeirarchy/BottomBarNode/BottomBar/DrawButton
 @onready var discard_button: Button = $UI/UIHeirarchy/BottomBarNode/BottomBar/DiscardButton
-@onready var exhaust_button: Button 
+@onready var exhaust_button: Button = $UI/UIHeirarchy/BottomBarNode/BottomBar/ExhaustButton
 
 func _update_deck_ui() -> void:
 	draw_button.text = "Deck\n" + str(deck_manager.get_draw_count())
 	discard_button.text = "Discard\n" + str(deck_manager.get_discard_count())
+	exhaust_button.text = "Exhaust\n" + str(deck_manager.get_exhaust_count())
+
+
+func _execute_summon_action(summon: SummonCreature, target: Node = null) -> void:
+	
+	if summon.used_this_turn or summon == null:
+		return
+	var card : CardData= summon.card_data
+	var targets: Array[Node] = targets_by_card_type(summon,target)
+	if targets == []:
+		selected_summon = null
+		return
+	CombatEffects.apply_effect_package(
+		summon,
+		targets,
+		card.damage,
+		card.block,
+		card.effects)
+	
+	
+	_draw_cards(summon.card_data.draw)
+	player.energy += summon.card_data.get_energy_gain()
+	RunState.gold += summon.card_data.get_coin_gain()
+	summon.used_this_turn = true
+	summon.modulate = Color(0.5, 0.5, 0.5, 1.0)  # grey out when used
+	update_player_ui()
+	_update_deck_ui()
+	check_death(target)
+	selected_summon = null
+
+func targets_by_card_type( summon:SummonCreature, target:Node) -> Array[Node]:
+	var card : CardData= summon.card_data
+	var targets: Array[Node] = []
+	match card.target_type:
+		CardData.TargetType.SINGLE_ENEMY:
+			for enemy in enemies:
+				if target == enemy:
+					return [enemy]
+			return []
+		CardData.TargetType.ALL_ENEMIES:
+			targets.append_array(enemies)
+		CardData.TargetType.SELF:
+			return [summon]
+		CardData.TargetType.SINGLE_ALLY:
+			if target == player:
+				return [player]
+			else:
+				for sum in summons:
+					if target == sum:
+						return [sum]
+		CardData.TargetType.ALL_ALLIES:
+			targets.append_array(summons)
+			targets.append(player)
+	return targets
 
 func _apply_card_effects(card: CardData, target: Node) -> void:
 	var targets: Array = []
@@ -272,23 +380,14 @@ func _apply_card_effects(card: CardData, target: Node) -> void:
 		targets = enemies
 	elif target != null:
 		targets = [target]
-	for t in targets:
-		if card.damage != 0:
-			_attack_target(card.damage, t, player)
-		for effect in card.effects:
-			if effect.name == "BleedSelf":
-				apply_effect(effect, player)
-			else:
-				apply_effect(effect, t)
-	if card.block != 0:
-		player.block += card.block
-	if card.draw != 0:
-		_draw_cards(card.draw)
-	if card.energy_gain != 0:
-		player.energy += card.energy_gain
-	for t in targets:
-		if t is EnemyCreature:
-			t.update_stats()
+	CombatEffects.apply_effect_package(
+	player,
+	targets,
+	card.damage,
+	card.block,
+	card.effects)
+	player.energy += card.energy
+	
 
 func _unhandled_input(event: InputEvent) -> void:
 	if phase == Phase.PLAYER_TURN:
@@ -305,7 +404,10 @@ func _unhandled_input(event: InputEvent) -> void:
 				if event.is_action_pressed(str(i)):
 					select_card_by_index(i)
 					break
-			
+		if event.is_action_pressed("Deselect"):
+			selected_card = null
+			selected_summon = null
+			_reset_card_positions()
 
 func popup_to_confirm_end_turn() -> void:
 	# TODO confirm dialog, maybe a flag to suppress input handling during it
@@ -319,7 +421,6 @@ func select_card_by_index(idx: int, field = false) -> void:
 		return
 	#in-field card
 	if idx >= deck_manager.summons.size():
-		print("1")
 		return
 	select_card(deck_manager.summons[idx])
 
@@ -336,53 +437,10 @@ func _draw_cards(n: int) -> void:
 	_update_deck_ui()
 
 @onready var energy_label: Label = $UI/UIHeirarchy/BottomBarNode/BottomBar/EnergyLabel
-func _update_player_ui() -> void:
+func update_player_ui() -> void:
 	player.update_stats()
 	energy_label.text = str(player.energy) + "/" +str(player.max_energy)
 
-func _attack_target(damage:int, target:Node, source: Node)->void:
-	#Str
-	for effect in source.effects:
-		if effect is EffectStrength:
-			damage += effect.stacks
-			break
-			
-		# Weak — source deals less damage
-	for effect in source.effects:
-		if effect is EffectWeak:
-			damage = int(damage * 0.75)
-			break
-	
-	# Vulnerable — target takes more damage
-	for effect in target.effects:
-		if effect is EffectVulnerable:
-			damage = int(damage * 1.5)
-			break
-			
-	if target.block == 0:
-		_proc_effects(target, GlobalEnums.ProcOn.ON_HP_DAMAGED, source)
-		target.current_hp -= damage
-		check_death(target)
-	elif target.block < damage:
-		_proc_effects(target, GlobalEnums.ProcOn.ON_SHIELD_DAMAGED, source)
-		_proc_effects(target, GlobalEnums.ProcOn.ON_HP_DAMAGED, source)
-		#TODO Add animation
-		var block_damage:int = target.block
-		target.block = 0
-		#TODO Add animation
-		target.current_hp -= (damage-block_damage)
-		check_death(target)
-	else: #Target fully blocks
-		#TODO Add animation
-		target.block -= damage
-	_proc_effects(target, GlobalEnums.ProcOn.ON_ATTACK,source)
-		
-		
-	#Modify UI
-	if target == player:
-		_update_player_ui()
-	else:
-		target.update_stats()
 
 func end_turn() -> void:
 	if phase != Phase.PLAYER_TURN:
@@ -391,7 +449,7 @@ func end_turn() -> void:
 	advance_phase()
 	turn_number += 1
 	
-	_proc_effects(player, GlobalEnums.ProcOn.TURN_END)
+	CombatEffects.proc_effects(player, GlobalEnums.ProcOn.TURN_END)
 
 func advance_phase() -> void:
 	match phase:
@@ -419,22 +477,40 @@ func _do_player_turn_start():
 	for summon in summons:
 		summon.used_this_turn = false
 		summon.modulate = Color(1.0, 1.0, 1.0, 1.0)
-	_proc_effects(player, GlobalEnums.ProcOn.TURN_START)
+	CombatEffects.proc_effects(player, GlobalEnums.ProcOn.TURN_START)
 	_draw_cards(card_draw_modifier+RunState.card_draw)
 	player.energy = player.max_energy
-	_update_player_ui()
+	update_player_ui()
 	check_death(player)
+	for summon in summons:
+		summon.block = 0
+		summon.update_stats()
 
 func _end_combat_loss():
+	_return_surviving_summons_to_discard()
 	#TODO Run loss animation
 	#TODO bring up title screen / game over with some stats eventually
 	RunState.scene_history.clear()
 	get_tree().change_scene_to_file.call_deferred("res://Scenes/lose.tscn")
 
 func _end_combat_victory() -> void:
+	_return_surviving_summons_to_discard()
 	RunState.current_hp = player.current_hp
 	RunState.map_data.get_current_node().cleared = true
 	RunState.push_scene.call_deferred("res://Scenes/RewardManager.tscn")
+
+func _return_surviving_summons_to_discard() -> void:
+	for summon in summons.duplicate():
+		if summon.card_data == null:
+			continue
+		var card :CardData= summon.card_data
+		card.in_field = false
+		deck_manager.summons.erase(card)
+		if card in deck_manager.exhaust_pile:
+			deck_manager.exhaust_pile.erase(card)
+		deck_manager.discard(card)
+		summon.queue_free()
+	summons.clear()
 
 func check_death(creature: Node):
 	if creature.current_hp <= 0:
@@ -445,7 +521,18 @@ func kill_creature(creature: Node) -> void:
 	if creature == player:
 		phase = Phase.END_COMBAT
 		advance_phase()
-	else:
+	elif creature is SummonCreature:
+		var summon := creature as SummonCreature
+		summons.erase(summon)
+		if summon.card_data != null:
+			var card := summon.card_data
+			card.in_field = false
+			deck_manager.summons.erase(card)
+			if card in deck_manager.exhaust_pile:
+				deck_manager.exhaust_pile.erase(card)
+			deck_manager.discard(card)
+		summon.queue_free()
+	elif creature is EnemyCreature:
 		#TODO enemy death animation
 		enemies.erase(creature)
 		creature.queue_free()
@@ -456,7 +543,7 @@ func kill_creature(creature: Node) -> void:
 func _do_enemy_turn_start() -> void:
 	for enemy in enemies:
 		enemy.block = 0
-		_proc_effects(enemy, GlobalEnums.ProcOn.TURN_START)
+		CombatEffects.proc_effects(enemy, GlobalEnums.ProcOn.TURN_START)
 		check_death(enemy)
 
 func _do_enemy_turn() -> void:
@@ -474,7 +561,7 @@ func _pick_enemy_move(turn:int, enemy: EnemyCreature):
 		current_move = enemy.data.move_pool_loop[(turn-enemy.data.starting_moves.size()-1) % enemy.data.move_pool_loop.size()]
 	
 	_do_current_move(current_move,enemy)
-	
+
 func _display_enemy_intent(turn:int, enemy: EnemyCreature):
 	var next_move :EnemyMove
 	if turn < enemy.data.starting_moves.size():
@@ -485,57 +572,50 @@ func _display_enemy_intent(turn:int, enemy: EnemyCreature):
 	_display_next_intent(next_move,enemy)
 
 func _do_current_move(move: EnemyMove, enemy: EnemyCreature):
+	var effect_target: Node = player
 	match move.intent_type:
 		#TODO Add animations
 		GlobalEnums.IntentType.ATTACK:
-			_attack_target(move.value, player, enemy)
+			effect_target = _pick_default_enemy_attack_target()
+			CombatEffects.attack_target(move.value, effect_target, enemy)
 		GlobalEnums.IntentType.BLOCK:
 			enemy.block += move.value
 	for effect in move.effects_on_target:
-		print("Applying target effect: ", effect)
-		effect.proc(player, enemy)
+		effect.proc(effect_target, enemy)
 	for effect in move.effects_on_self:
-		print("Applying self effect: ", effect)
 		effect.proc(enemy, enemy)
+	check_death(effect_target)
 
 func _display_next_intent(move: EnemyMove, enemy: EnemyCreature):
 	enemy.display_move(move)
 	#TODO Add animation
 
 func _do_player_turn_end():
-	_proc_effects(player, GlobalEnums.ProcOn.TURN_END)
+	CombatEffects.proc_effects(player, GlobalEnums.ProcOn.TURN_END)
 	for card in deck_manager.hand.duplicate():
 		deck_manager.discard(card)
 	deck_manager.hand.clear()
 	for child in hand_container.get_children():
 		child.queue_free()
+	for summon in summons:
+		summon.used_this_turn = false
+	selected_card = null
+	selected_summon = null
 	_update_deck_ui()
 
 func _do_enemy_turn_end():
 	for enemy in enemies:
-		_proc_effects(enemy, GlobalEnums.ProcOn.TURN_END)
-
-func _proc_effects(creature: Node, proc_on: GlobalEnums.ProcOn, from: Node = null) -> void:
-	for effect in creature.effects:
-		if effect.proc_on == proc_on:
-			effect.proc(creature, from)
-			creature.update_stats()
-
-#const MAP_VIEWER = preload("res://Scenes/MapManager.tscn")
-#var map_open: bool = false
-#
-#func _on_map_button_pressed() -> void:
-	#if map_open:
-		#return
-	#map_open = true
-	#var map = MAP_VIEWER.instantiate()
-	#map.preview_mode = true
-	#add_child(map)
-	#map.close_requested.connect(func():
-		#map.queue_free()
-		#map_open = false
-	#)
+		CombatEffects.proc_effects(enemy, GlobalEnums.ProcOn.TURN_END)
 
 
-func _on_exhaut_button_pressed() -> void:
-	pass # Replace with function body.
+func _on_exhaust_button_pressed() -> void:
+	#Visualize exhaust pile
+	RunState.open_deck_viewer(self, deck_manager.exhaust_pile, "Exhaust Pile")
+
+func _on_discard_button_pressed() -> void:
+	#Visualize discard pile
+	RunState.open_deck_viewer(self, deck_manager.discard_pile, "Discard Pile")
+
+func _on_draw_button_pressed() -> void:
+	#Visualize draw pile
+	RunState.open_deck_viewer(self, deck_manager.draw_pile, "Draw Pile")
