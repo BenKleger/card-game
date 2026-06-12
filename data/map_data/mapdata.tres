@@ -1,8 +1,0 @@
-[gd_resource type="Resource" script_class="MapData" load_steps=3 format=3 uid="uid://cqrbehx2cbkec"]
-
-[ext_resource type="Script" uid="uid://bjmljuj8iss4o" path="res://Resources/ResourceClasses/map_node.gd" id="1_yg0oo"]
-[ext_resource type="Script" uid="uid://3j73q1uuraow" path="res://Resources/ResourceClasses/map_data.gd" id="2_0t8r2"]
-
-[resource]
-script = ExtResource("2_0t8r2")
-map_position = Vector2i(1, 1)

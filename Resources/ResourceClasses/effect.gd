@@ -9,6 +9,9 @@ extends Resource
 func proc(_owner: Node, _from: Node = null) -> void:
 	pass
 
+func setup(stacks: int) -> void:
+	self.stacks = stacks
+
 func on_applied(_owner: Node) -> void:
 	# Called when effect is first applied
 	pass

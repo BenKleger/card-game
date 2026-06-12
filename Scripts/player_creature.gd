@@ -7,6 +7,17 @@ var block: int
 var energy: int
 var max_energy: int = RunState.max_energy
 var effects: Array[Effect]
+var permanent_block: int = 0
+
+func get_effect(effect_type: GDScript) -> Effect:
+	for effect in effects:
+		if effect.get_script() == effect_type:
+			return effect
+	return null
+
+func _ready() -> void:
+	permanent_block = 0
+	
 
 signal clicked(player: PlayerCreature)
 

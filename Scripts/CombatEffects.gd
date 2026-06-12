@@ -19,30 +19,53 @@ static func apply_effect(effect: Effect, target: Node) -> void:
 	target.effects.append(new_effect)
 	new_effect.on_applied(target)
 
+static func gain_block(target: Node, amount: int) -> void:
+	var final_amount = amount
+	var frail :EffectFrail= target.get_effect(EffectFrail)
+	if frail:
+		final_amount = floor(final_amount * 0.75)
+	target.block += final_amount
 
-static func apply_effect_package(
+static func resolve_action(
 	source: Node,
 	targets: Array,
 	damage: int,
 	block: int,
-	effects: Array[Effect]
+	target_effects: Array[Effect],
+	self_effects: Array[Effect] = []
 ) -> void:
 
 	for target in targets:
 		if damage > 0:
 			attack_target(damage, target, source)
 		if block > 0:
-			target.block += block
-		for effect in effects:
-			apply_effect(effect.duplicate(), target)
+			gain_block(target,block)
+		apply_target_effects(target,target_effects)
 		target.update_stats()
+	apply_source_effects(source, self_effects)
+	source.update_stats()
 
+static func apply_target_effects(
+	target: Node,
+	target_effects: Array[Effect]
+):
+	for effect in target_effects:
+		apply_effect(effect.duplicate(), target)
+		
+static func apply_source_effects(
+	source: Node,
+	self_effects: Array[Effect]
+):
+	
+	for effect in self_effects:
+		apply_effect(effect.duplicate(), source)
+	
 static func attack_target(damage:int, target:Node, source: Node)->void:
 	#Str
 	for effect in source.effects:
 		if effect is EffectStrength:
 			damage += effect.stacks
-			break
+			break 
 			
 		# Weak — source deals less damage
 	for effect in source.effects:

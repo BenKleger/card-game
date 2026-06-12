@@ -64,8 +64,8 @@ func _move(intent: GlobalEnums.IntentType, val: int, desc: String,effects_on_tar
 	m.intent_type = intent
 	m.value = val
 	m.description = desc
-	m.effects_on_self = effects_on_self
-	m.effects_on_target = effects_on_target
+	m.target_effects = effects_on_target
+	m.self_effects = effects_on_self
 	return m
 
 # --- Combat enemies ---
@@ -75,7 +75,7 @@ func _ashwalker_scout() -> EnemyData:
 	return _enemy("Ashwalker Scout", 18, [slash], [slash, feint, slash])
 
 func _rot_hound() -> EnemyData:
-	var gnaw = _move(GlobalEnums.IntentType.ATTACK, 4, "Deals 4 damage")
+	var gnaw = _move(GlobalEnums.IntentType.AOEATTACK, 4, "Deals 4 damage",  [EffectLibrary.bleed(2)],[EffectLibrary.regen(2)])
 	var frenzy = _move(GlobalEnums.IntentType.ATTACK, 8, "Deals 8 damage")
 	return _enemy("Rot Hound", 14, [gnaw], [gnaw, gnaw, frenzy])
 

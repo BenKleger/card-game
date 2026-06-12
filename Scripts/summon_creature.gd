@@ -16,6 +16,16 @@ var used_this_turn: bool = false
 @onready var block_label: Label = $StatBox/LabelContainer/BlockLabel
 @onready var effects_container: HBoxContainer = $StatBox/EffectsContainer
 @onready var description_label: Label = $StatBox/DescriptionLabel
+var permanent_block :int = 0
+func _ready() -> void:
+	permanent_block = 0
+	
+
+func get_effect(effect_type: GDScript) -> Effect:
+	for effect in effects:
+		if effect.get_script() == effect_type:
+			return effect
+	return null
 
 func setup(data: CardData) -> void:
 	card_data = data

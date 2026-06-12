@@ -3,6 +3,7 @@ extends Control
 @export var data: EnemyData
 var current_hp: int
 var max_hp: int
+var permanent_block: int = 0
 var block: int = 0
 var effects: Array[Effect]
 @onready var intent_label: Label = $IntentLabel
@@ -15,9 +16,10 @@ var effects: Array[Effect]
 signal clicked(enemy: EnemyCreature)
 
 func _ready() -> void:
+	permanent_block = 0
+	
 	self.modulate = Color(0.75, 0.75, 0.75, 1.0)
 	update_stats()
-
 
 func display_move(move: EnemyMove) -> void:
 	intent_label.text = move.description
@@ -30,13 +32,15 @@ func display_move(move: EnemyMove) -> void:
 func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 		clicked.emit(self)
-		
 
 func pick_next_move():
 	pass
 
-
-	
+func get_effect(effect_type: GDScript) -> Effect:
+	for effect in effects:
+		if effect.get_script() == effect_type:
+			return effect
+	return null
 
 func update_stats() -> void:
 	name_label.text = data.enemy_name if data else ""
