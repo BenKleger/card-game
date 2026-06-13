@@ -3,15 +3,29 @@ extends Control
 
 signal clicked(card: CardData)
 
-var card_data: CardData
+var card_data: CardData = null
+@onready var description: Label = $Container/Description
+@onready var name_label: Label = $Container/NameLabel
+@onready var energy_cost: Label = $Container/Costs/EnergyCost
+@onready var coin_cost: Label = $Container/Costs/CoinCost
+
+var pending_data: CardData
 
 func setup(data: CardData) -> void:
-	card_data = data.duplicate() 
-	card_data.uid = data.uid  
-	$Container/Name.text = data.card_name
-	$Container/Costs/EnergyCost.text = str(data.energy_cost)
-	$Container/Costs/CoinCost.text = str(data.coin_value)
-	$Container/Description.text = data.description
+	card_data = data
+	update_display()
+
+func _ready():
+	update_display()
+
+func update_display():
+	if card_data == null:
+		return
+	name_label.text = card_data.card_name
+	energy_cost.text = str(card_data.energy_cost)
+	coin_cost.text = str(card_data.coin_value)
+	description.text = CardLibrary.generate_description(card_data)
+	
 
 
 func _input(event: InputEvent) -> void:

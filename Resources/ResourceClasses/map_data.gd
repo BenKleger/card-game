@@ -28,7 +28,7 @@ func _get_starting_nodes() -> Array[MapNode]:
 	# Returns all nodes on floor 0 — entry points to the map
 	var result: Array[MapNode] = []
 	for node in nodes:
-		if node.floor == 0:
+		if node.current_floor == 0:
 			result.append(node)
 	return result
 	
@@ -61,7 +61,7 @@ func generate(rng: RandomNumberGenerator) -> void:
 		var this_floor: Array = []
 		for i in count:
 			var node = MapNode.new()
-			node.floor = f
+			node.current_floor = f
 			node.node_index = nodes.size()
 			node.type = _pick_node_type(f, floors, type_weights, rng)
 			node.encounter = _pick_encounter(node.type, rng)

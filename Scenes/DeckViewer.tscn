@@ -3,7 +3,6 @@
 [ext_resource type="Script" uid="uid://bcm6abwlg4kiq" path="res://Scripts/canvas_layer.gd" id="1_8f2av"]
 
 [node name="DeckViewer" type="CanvasLayer"]
-layer = 20
 script = ExtResource("1_8f2av")
 
 [node name="PanelContainer" type="PanelContainer" parent="."]

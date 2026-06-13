@@ -2,9 +2,35 @@
 extends Node
 
 var all_cards: Array[CardData] = []
+var omitted_cards:Array[CardData] = [] # Cards not given in rewards
+func get_reward_cards()-> Array[CardData]:
+	var cards :Array[CardData] = []
+	for card in all_cards:
+		if card not in omitted_cards:
+			cards.append(card)
+	return cards
 
 func _ready() -> void:
 	_build_cards()
+
+func generate_description(card: CardData) -> String:
+	var desc := ""
+	if card.damage > 0:
+		desc += str(card.damage) + " Damage\n"
+	if card.block > 0:
+		desc += str(card.block) + " Block\n"
+	if card.draw > 0:
+		desc += str(card.draw) + " Draw\n"
+	if card.energy_gain > 0:
+		desc += str(card.energy_gain) + " Energy\n"
+	for effect in card.target_effects:
+		if effect != null:
+			desc += effect.name + " " + str(effect.stacks) + " Target\n"
+	for effect in card.self_effects:
+		if effect != null:
+			desc += effect.name + " " + str(effect.stacks) + " Self\n"
+	
+	return desc
 
 func get_cards_by_rarity(rarity: GlobalEnums.CardRarity) -> Array[CardData]:
 	return all_cards.filter(func(c): return c.rarity == rarity)
@@ -13,18 +39,19 @@ func get_cards_by_color(color: GlobalEnums.CardColor) -> Array[CardData]:
 	return all_cards.filter(func(c): return c.color == color)
 
 func _build_cards() -> void:
-	all_cards.append(_card("Rabid Hound", 1, GlobalEnums.CardColor.RED, GlobalEnums.CardRarity.COMMON,
-		CardData.TargetType.SINGLE_ENEMY, 4, 0, 0, 0, 0, [], GlobalEnums.CardType.FIELD, 5, true, false))
-	all_cards.append(_card("Shitty", 1, GlobalEnums.CardColor.RED, GlobalEnums.CardRarity.COMMON,
-		CardData.TargetType.SINGLE_ALLY , 0, 5, 0, 0, 0, [], GlobalEnums.CardType.FIELD, 5, false, true))
-	
-	
-	# --- Colorless — starter cards, available to all ---
 	all_cards.append(_card("Defend", 1, GlobalEnums.CardColor.BLUE, GlobalEnums.CardRarity.COMMON,
 		CardData.TargetType.SELF, 0, 5, 0, 0, 0, []))
 	
 	all_cards.append(_card("Strike", 1, GlobalEnums.CardColor.RED, GlobalEnums.CardRarity.COMMON,
 		CardData.TargetType.SINGLE_ENEMY, 6, 0, 0, 0, 0, []))
+	
+	all_cards.append(_card("Rabid Hound", 1, GlobalEnums.CardColor.RED, GlobalEnums.CardRarity.COMMON,
+		CardData.TargetType.SINGLE_ENEMY, 4, 0, 0, 0, 0, [], GlobalEnums.CardType.FIELD, 5, true, false))
+	all_cards.append(_card("Shitty", 1, GlobalEnums.CardColor.RED, GlobalEnums.CardRarity.COMMON,
+		CardData.TargetType.SINGLE_ALLY , 0, 5, 0, 0, 0, [], GlobalEnums.CardType.FIELD, 5, false, true))
+	
+	# --- Colorless — starter cards, available to all ---
+
 	
 	# --- RED cards — aggressive, high damage, self-damage, bleed ---
 	all_cards.append(_card("Cleave", 1, GlobalEnums.CardColor.RED, GlobalEnums.CardRarity.COMMON,
@@ -256,7 +283,8 @@ func _card(
 	card_type :GlobalEnums.CardType = GlobalEnums.CardType.PERMANENT,
 	summon_hp: int = 1,
 	takes_aggro: bool = false,
-	is_passive: bool = false
+	is_passive: bool = false,
+	self_effects:Array[Effect] = []
 ) -> CardData:
 	var c = CardData.new()
 	c.uid = get_next_uid()
@@ -270,7 +298,8 @@ func _card(
 	c.draw = draw
 	c.energy_gain = energy_gain
 	c.coin_gain = coin_gain
-	c.effects = effects
+	c.target_effects = effects
+	c.self_effects = self_effects
 	c.description = _generate_description(damage, block, draw, energy_gain, effects)
 	c.card_type = card_type
 	c.summon_hp = summon_hp

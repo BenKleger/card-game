@@ -5,4 +5,4 @@ extends Resource
 @export var cleared: bool = false
 @export var node_index: int
 @export var encounter: EncounterData
-@export var floor: int = 0
+@export var current_floor: int = 0

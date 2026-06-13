@@ -16,6 +16,7 @@ var current_floor:int = 0
 var relics: Array = [] # set up to be an array of Relics TODO
 var rng := RandomNumberGenerator.new()
 
+
 # Offerings Data
 var max_accepted_cards:int = 1
 var gold_offered: int = 0
@@ -28,7 +29,11 @@ var relic_accepted: bool = false
 
 var deck_viewer: CanvasLayer = null
 
+#Rest site stuff
 var rest_heal_percent: float = 0.3
+var upgrades_available: int = 0
+var ui_locked: bool = false
+var choices_per_rest: int = 1
 
 #TODO Relic / Effect Connections###
 var card_energy_reduction: int = 0

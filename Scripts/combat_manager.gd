@@ -2,7 +2,7 @@ class_name CombatManager
 extends Node
 
 # Phase of combat
-enum Phase{PLAYER_TURN_START,PLAYER_TURN,PLAYER_TURN_END,END_COMBAT}
+enum Phase{PLAYER_TURN_START,PLAYER_TURN,PLAYER_TURN_END}
 
 #TODO Perhaps changing player to players; allowing for summoning friendly creatures
 
@@ -11,11 +11,11 @@ var card_draw_modifier: int = 0
 var summon_slot_modifier: int = 0
 
 enum SummonColumn { PASSIVE, NEUTRAL, TANK }
-const BASE_SUMMON_SLOTS_PER_COLUMN: int = 3
+const BASE_SUMMON_SLOTS_PER_COLUMN: int = 1
 var enemies: Array[EnemyCreature]
 var combat_seed: int
 const ENEMY_SCENE = preload("res://scenes/EnemyCreature.tscn")
-const CARD_SCENE = preload("res://scenes/Card.tscn")
+const CARD_SCENE = preload("res://Scenes/Card.tscn")
 @onready var deck_manager: DeckManager = $DeckManager
 @onready var player: PlayerCreature = $UI/UIHeirarchy/BattleAreaNode/BattleArea/PlayerArea/PlayerCreature
 var turn_number: int = 1
@@ -140,9 +140,11 @@ func _reset_card_positions() -> void:
 func _raise_selected_card(card: CardData) -> void:
 	_reset_card_positions()
 	for child in hand_container.get_children():
+		if child.card_data == null:
+			continue
+			print("continued3")
 		if child.card_data.uid == card.uid:
 			child.position.y = -30
-
 func select_target(target: Node = null) -> void:
 	#TODO UNIFY CARD TARGETING
 	if phase != Phase.PLAYER_TURN:
@@ -291,10 +293,12 @@ func _remove_card_from_hand(card: CardData) -> void:
 		if child.card_data.uid == card.uid:
 			child.queue_free()
 			break
-	for i in deck_manager.hand.size():
-		if deck_manager.hand[i].uid == card.uid:
-			deck_manager.hand.remove_at(i)
-			break
+	deck_manager.hand = deck_manager.hand.filter(func(c):
+		return c != null and c.uid != card.uid
+)
+	for child in hand_container.get_children():
+		if child.card_data != null and child.card_data.uid == card.uid:
+			child.queue_free()
 	_update_deck_ui()
 	update_player_ui()
 
@@ -322,7 +326,7 @@ func _execute_summon_action(summon: SummonCreature, target: Node = null) -> void
 		targets,
 		card.damage,
 		card.block,
-		card.effects,
+		card.target_effects,
 		card.self_effects)
 	
 	
@@ -359,6 +363,8 @@ func targets_by_card_type( summon:SummonCreature, target:Node) -> Array[Node]:
 		CardData.TargetType.ALL_ALLIES:
 			targets.append_array(summons)
 			targets.append(player)
+		CardData.TargetType.NONE:
+			targets = [target]
 	return targets
 
 func _apply_card_effects(card: CardData, target: Node) -> void:
@@ -372,7 +378,9 @@ func _apply_card_effects(card: CardData, target: Node) -> void:
 	targets,
 	card.damage,
 	card.block,
-	card.effects)
+	card.target_effects,
+	card.self_effects
+	)
 	player.energy += card.energy_gain
 	
 
@@ -418,9 +426,10 @@ func _draw_cards(n: int) -> void:
 	deck_manager.hand.append_array(drawn)
 	for card_data in drawn:
 		var card = CARD_SCENE.instantiate()
-		card.setup(card_data)
 		card.clicked.connect(_on_card_clicked)
 		hand_container.add_child(card)
+		
+		card.setup(card_data)
 	_update_deck_ui()
 
 @onready var energy_label: Label = $UI/UIHeirarchy/BottomBarNode/BottomBar/EnergyLabel
@@ -459,20 +468,14 @@ func advance_phase() -> void:
 			phase = Phase.PLAYER_TURN_START
 			advance_phase.call_deferred()
 
-		Phase.END_COMBAT:
-			if enemies.is_empty():
-				_end_combat_victory()
-			else:
-				_end_combat_loss()
 
 func _resolve_deaths():
 	for c in summons.duplicate():
 		check_death(c)
-
 	check_death(player)
-
 	for e in enemies.duplicate():
 		check_death(e)
+		
 
 
 func _do_player_turn_start():
@@ -501,6 +504,12 @@ func _end_combat_loss():
 
 func _end_combat_victory() -> void:
 	_return_surviving_summons_to_discard()
+	for card in deck_manager.hand.duplicate():
+		deck_manager.discard(card)
+	deck_manager.hand.clear()
+	for child in hand_container.get_children():
+		child.queue_free()
+
 	RunState.current_hp = player.current_hp
 	RunState.map_data.get_current_node().cleared = true
 	RunState.push_scene.call_deferred("res://Scenes/RewardManager.tscn")
@@ -519,34 +528,58 @@ func _return_surviving_summons_to_discard() -> void:
 	summons.clear()
 
 func check_death(creature: Node):
+	if creature == null:
+		return
 	if creature.current_hp <= 0:
 		kill_creature(creature)
 
 func kill_creature(creature: Node) -> void:
+	if creature == null:
+		return
 	if creature.is_queued_for_deletion():
 		return
-	if creature == player:
-		phase = Phase.END_COMBAT
-		advance_phase()
-	elif creature is SummonCreature:
-		var summon := creature as SummonCreature
-		summons.erase(summon)
-		if summon.card_data != null:
-			var card := summon.card_data
-			if !card.in_field:
-				return
-			card.in_field = false
-			deck_manager.summons.erase(card)
-			deck_manager.discard(card)
-		summon.queue_free()
-	elif creature is EnemyCreature:
-		#TODO enemy death animation
-		enemies.erase(creature)
-		creature.queue_free()
-		if enemies.is_empty():
-			phase = Phase.END_COMBAT
-			advance_phase()
+	_mark_dead(creature)
 
+func _mark_dead(creature: Node) -> void:
+	if creature == player:
+		_request_combat_end(false)
+		return
+
+	if creature is SummonCreature:
+		_remove_summon(creature)
+	elif creature is EnemyCreature:
+		_remove_enemy(creature)
+
+func _remove_summon(summon: SummonCreature) -> void:
+	summons.erase(summon)
+
+	var card := summon.card_data
+	if card != null:
+		card.in_field = false
+		deck_manager.summons.erase(card)
+		deck_manager.discard(card)
+
+	summon.queue_free()
+
+func _remove_enemy(enemy: EnemyCreature) -> void:
+	enemies.erase(enemy)
+	enemy.queue_free()
+
+	if enemies.is_empty():
+		_request_combat_end(true)
+
+var pending_combat_end = null
+
+func _request_combat_end(victory: bool) -> void:
+	pending_combat_end = victory
+
+func _process(_delta):
+	if pending_combat_end != null:
+		if pending_combat_end:
+			_end_combat_victory()
+		else:
+			_end_combat_loss()
+		pending_combat_end = null
 func _do_enemy_turn_start() -> void:
 	for enemy in enemies:
 		_clear_block(enemy)
@@ -581,7 +614,7 @@ func _display_enemy_intent(turn:int, enemy: EnemyCreature):
 	_display_next_intent(next_move,enemy)
 
 func _do_current_move(move: EnemyMove, enemy: EnemyCreature):
-	var targets :Array[Node] = _get_move_targets(move)
+	var targets :Array[Node] = _get_move_targets(move, enemy)
 
 	CombatEffects.resolve_action(
 		enemy,
@@ -598,13 +631,17 @@ func _do_current_move(move: EnemyMove, enemy: EnemyCreature):
 	for target in targets:
 		call_deferred("check_death",target)
 
-func _get_move_targets(move: EnemyMove) -> Array[Node]:
+func _get_move_targets(move: EnemyMove, enemy) -> Array[Node]:
 	var targets:Array[Node]= []
 	match move.intent_type:
-		GlobalEnums.IntentType.ATTACK:
+		GlobalEnums.IntentType.ATTACK, GlobalEnums.IntentType.DEBUFF:
 			targets.append(_pick_default_enemy_attack_target())
 		GlobalEnums.IntentType.AOEATTACK:
 			targets = _target_all_friendlies()
+		GlobalEnums.IntentType.BLOCK:
+			targets = [enemy]
+		_:
+			targets = [enemy]
 	return targets
 
 func _target_all_friendlies()->Array[Node]:
@@ -647,7 +684,6 @@ func _do_player_turn_end():
 	_update_deck_ui()
 	for summon in summons.duplicate():
 		CombatEffects.proc_effects(summon, GlobalEnums.ProcOn.TURN_END)
-		_clear_block(summon)
 		summon.update_stats()
 		
 

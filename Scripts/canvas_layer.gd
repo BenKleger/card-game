@@ -11,12 +11,41 @@ var sort_mode: SortMode = SortMode.COST
 
 @onready var sort_button: Button = $PanelContainer/VBoxContainer/VBoxContainer/SortButton
 
-var upgrade_menu = false
 #TODO if upgrade menu; set up cards as clickable in ready; spawn gui upon clicking a card; showing upgraded variant, option to confirm or cancel the card being upgrade; also to 
 # cancel the upgrade separately; maybe in all deckviewer menus make the view upgraded card with cancel always available, but only upgrade button if upgrade_menu =true
 # also ensure that once the upgrade is pressed the menu is closed and the option to upgrade at rest_site perhaps setup in runstate is taken; also 
 #TODO make sure that off spawn you get limited rest site options; creating a runstate variable that defines the number of upgrade options and graying out all remaining options once the number has been hit
+const UpgradePreviewScene = preload("res://Scenes/UpgradePreview.tscn")
 
+var card_clicked:CardData=  null
+
+func _on_card_clicked(card: CardData) -> void:
+	if RunState.ui_locked:
+		return
+	var preview = UpgradePreviewScene.instantiate()
+	add_child(preview)
+	preview.open(card)
+	card_clicked = card
+	preview.confirmed.connect(_apply_upgrade)
+
+func _apply_upgrade(card:CardData) -> void:
+	print("card clicked uid: "+ str(card_clicked.uid))
+	if RunState.upgrades_available <= 0:
+		return
+	if card_clicked == null:
+		print("):")
+		return
+		
+	for c in RunState.deck:
+		if c == null:
+			continue
+		if c.uid == card_clicked.uid:
+			c.upgrade()
+			print(":DDD")
+			break
+
+	RunState.upgrades_available -= 1
+	_populate()
 
 func _populate() -> void:
 	title.text = _title + " — " + str(_cards.size()) + " cards"
@@ -25,9 +54,10 @@ func _populate() -> void:
 	var sorted = _sort_cards(_cards.duplicate())
 	for card_data in sorted:
 		var card = CARD_SCENE.instantiate()
-		card.setup(card_data)
 		card.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		grid.add_child(card)
+		card.setup(card_data)
+		card.clicked.connect(_on_card_clicked)
 		card.size = Vector2(120, 160)
 	sort_button.text = "Sort: " + SortMode.keys()[sort_mode].capitalize()
 
@@ -67,5 +97,6 @@ func _ready() -> void:
 signal close_requested
 
 func _on_close_button_pressed() -> void:
+	RunState.ui_locked = false
 	close_requested.emit()
 	queue_free()

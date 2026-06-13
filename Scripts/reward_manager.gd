@@ -177,9 +177,9 @@ func _clear_cards():
 
 func _offer_card(card_data:CardData) -> CardData:
 	var card = CARD_SCENE.instantiate()
-	card.setup(card_data)
 	card.clicked.connect(_on_card_clicked)
 	card_container.add_child(card)
+	card.setup(card_data)
 	return card_data
 
 func _on_card_clicked(card: CardData) -> void:

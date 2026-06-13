@@ -19,7 +19,6 @@ func frail(stacks: int) -> EffectFrail:
 	return _make(EffectFrail.new(), stacks)
 func poison(stacks: int) -> EffectPoison:
 	return _make(EffectPoison.new(), stacks)
-
 func barrier(stacks: int) -> EffectBarrier:
 	return _make(EffectBarrier.new(), stacks)
 func _make(effect: Effect, stacks: int) -> Effect:

@@ -53,9 +53,9 @@ func _setup_camera_bounds() -> void:
 
 func _build_floor_map() -> void:
 	for node in RunState.map_data.nodes:
-		if not floor_map.has(node.floor):
-			floor_map[node.floor] = []
-		floor_map[node.floor].append(node)
+		if not floor_map.has(node.current_floor):
+			floor_map[node.current_floor] = []
+		floor_map[node.current_floor].append(node)
 
 func _setup_camera() -> void:
 	camera = Camera2D.new()
@@ -133,13 +133,13 @@ func _create_node_button(node: MapNode, is_available: bool) -> Button:
 	return btn
 
 func _get_node_position(node: MapNode) -> Vector2:
-	var floor_nodes = floor_map[node.floor]
+	var floor_nodes = floor_map[node.current_floor]
 	var floor_count = floor_nodes.size()
 	var col_index = floor_nodes.find(node)
 	
 	var viewport_width = get_viewport_rect().size.x
 	var x = (col_index - (floor_count - 1) / 2.0) * NODE_SPACING_X + viewport_width / 2.0
-	var y = -node.floor * NODE_SPACING_Y  # no viewport offset, camera handles that
+	var y = -node.current_floor * NODE_SPACING_Y  # no viewport offset, camera handles that
 	return Vector2(x, y)
 
 func _get_node_label(type: GlobalEnums.MapNodeType) -> String:
@@ -161,6 +161,7 @@ func _on_node_pressed(node_index: int) -> void:
 	var node = RunState.map_data.nodes[node_index]
 	RunState.scene_history.clear()
 	RunState.map_data.current_node_index = node_index
+	RunState.current_floor = node.current_floor +1
 	match node.type:
 		GlobalEnums.MapNodeType.COMBAT, GlobalEnums.MapNodeType.ELITE, GlobalEnums.MapNodeType.BOSS:
 			RunState.push_scene("res://Scenes/CombatManager.tscn")

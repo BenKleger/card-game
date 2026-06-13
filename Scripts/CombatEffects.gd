@@ -39,7 +39,10 @@ static func resolve_action(
 		if damage > 0:
 			attack_target(damage, target, source)
 		if block > 0:
-			gain_block(target,block)
+			if damage > 0: #Attack card
+				gain_block(source,block)
+			else: # Defence card
+				gain_block(target,block)
 		apply_target_effects(target,target_effects)
 		target.update_stats()
 	apply_source_effects(source, self_effects)
@@ -78,19 +81,16 @@ static func attack_target(damage:int, target:Node, source: Node)->void:
 		if effect is EffectVulnerable:
 			damage = int(damage * 1.5)
 			break
-			
-	if target.block == 0:
-		proc_effects(target, GlobalEnums.ProcOn.ON_HP_DAMAGED, source)
-		target.current_hp -= damage
-	elif target.block < damage:
+	var target_block: int = target.block
+	
+	if(target.block>0):
 		proc_effects(target, GlobalEnums.ProcOn.ON_SHIELD_DAMAGED, source)
+		target.block = max(target.block-damage,0)
+		#TODO Add animation
+	
+	if damage-target_block>0:
 		proc_effects(target, GlobalEnums.ProcOn.ON_HP_DAMAGED, source)
+		target.current_hp -= damage-target_block
 		#TODO Add animation
-		var block_damage:int = target.block
-		target.block = 0
-		#TODO Add animation
-		target.current_hp -= (damage-block_damage)
-	else: #Target fully blocks
-		#TODO Add animation
-		target.block -= damage
+	
 	proc_effects(target, GlobalEnums.ProcOn.ON_ATTACK,source)
