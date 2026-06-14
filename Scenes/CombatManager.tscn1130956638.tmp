@@ -1,0 +1,160 @@
+[gd_scene load_steps=4 format=3 uid="uid://dh5qc055gxswy"]
+
+[ext_resource type="Script" uid="uid://dt4ykxk3dm83t" path="res://Scripts/combat_manager.gd" id="1_82n6i"]
+[ext_resource type="Script" uid="uid://brwwv5ya0es10" path="res://Scripts/deck_manager.gd" id="2_f5ypw"]
+[ext_resource type="PackedScene" uid="uid://rdcx2h1pbtv4" path="res://Scenes/PlayerCreature.tscn" id="3_f5ypw"]
+
+[node name="CombatManager" type="Node"]
+script = ExtResource("1_82n6i")
+
+[node name="DeckManager" type="Node" parent="."]
+script = ExtResource("2_f5ypw")
+
+[node name="UI" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="ColorRect" type="ColorRect" parent="UI"]
+z_index = -5
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+
+[node name="UIHeirarchy" type="VBoxContainer" parent="UI"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="BattleAreaNode" type="Control" parent="UI/UIHeirarchy"]
+custom_minimum_size = Vector2(0, 180)
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="ColorRect" type="ColorRect" parent="UI/UIHeirarchy/BattleAreaNode"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.20871013, 0.20871016, 0.20871013, 1)
+
+[node name="BattleArea" type="HBoxContainer" parent="UI/UIHeirarchy/BattleAreaNode"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+alignment = 1
+
+[node name="PlayerArea" type="HBoxContainer" parent="UI/UIHeirarchy/BattleAreaNode/BattleArea"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="PassiveColumn" type="VBoxContainer" parent="UI/UIHeirarchy/BattleAreaNode/BattleArea/PlayerArea"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="PlayerCreature" parent="UI/UIHeirarchy/BattleAreaNode/BattleArea/PlayerArea" instance=ExtResource("3_f5ypw")]
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 4
+
+[node name="NeutralColumn" type="VBoxContainer" parent="UI/UIHeirarchy/BattleAreaNode/BattleArea/PlayerArea"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="TankColumn" type="VBoxContainer" parent="UI/UIHeirarchy/BattleAreaNode/BattleArea/PlayerArea"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="EnemyArea" type="HBoxContainer" parent="UI/UIHeirarchy/BattleAreaNode/BattleArea"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+alignment = 1
+
+[node name="BottomBarNode" type="Control" parent="UI/UIHeirarchy"]
+custom_minimum_size = Vector2(180, 150)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="ColorRect" type="ColorRect" parent="UI/UIHeirarchy/BottomBarNode"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.38928655, 0.38928664, 0.3892865, 1)
+
+[node name="BottomBar" type="HBoxContainer" parent="UI/UIHeirarchy/BottomBarNode"]
+custom_minimum_size = Vector2(180, 0)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="DrawButton" type="Button" parent="UI/UIHeirarchy/BottomBarNode/BottomBar"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "Draw Pile
+"
+
+[node name="HandContainer" type="HBoxContainer" parent="UI/UIHeirarchy/BottomBarNode/BottomBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="ExhaustButton" type="Button" parent="UI/UIHeirarchy/BottomBarNode/BottomBar"]
+layout_mode = 2
+text = "Exhaust Pile"
+
+[node name="DiscardButton" type="Button" parent="UI/UIHeirarchy/BottomBarNode/BottomBar"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "Discard Pile"
+
+[node name="EnergyLabel" type="Label" parent="UI/UIHeirarchy/BottomBarNode/BottomBar"]
+custom_minimum_size = Vector2(37.9, 23.3)
+layout_mode = 2
+size_flags_horizontal = 8
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="EndTurnButton" type="Button" parent="UI/UIHeirarchy/BottomBarNode/BottomBar"]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+size_flags_horizontal = 8
+text = "End Turn"
+
+[connection signal="pressed" from="UI/UIHeirarchy/BottomBarNode/BottomBar/DrawButton" to="." method="_on_draw_button_pressed"]
+[connection signal="pressed" from="UI/UIHeirarchy/BottomBarNode/BottomBar/ExhaustButton" to="." method="_on_exhaust_button_pressed"]
+[connection signal="pressed" from="UI/UIHeirarchy/BottomBarNode/BottomBar/DiscardButton" to="." method="_on_discard_button_pressed"]
+[connection signal="pressed" from="UI/UIHeirarchy/BottomBarNode/BottomBar/EndTurnButton" to="." method="end_turn"]

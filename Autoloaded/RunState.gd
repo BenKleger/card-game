@@ -157,6 +157,7 @@ func new_run(run_seed: int = randi()) -> void:
 	relics = []
 	map_data = null
 	current_floor = 0
+	
 	clear_rewards()
 	_create_map()
 	_generate_starting_deck()
@@ -169,9 +170,9 @@ func _generate_starting_deck():
 	var strike = CardLibrary.all_cards[0]
 	var defend = CardLibrary.all_cards[1]
 	for i in 5:
-		var copy = strike.duplicate()
+		var copy = strike.duplicate(true)
 		copy.uid = CardLibrary.get_next_uid()
 		deck.append(copy)
-		var defcopy = defend.duplicate()
+		var defcopy = defend.duplicate(true)
 		defcopy.uid = CardLibrary.get_next_uid()
 		deck.append(defcopy)

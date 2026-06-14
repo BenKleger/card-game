@@ -22,11 +22,12 @@ var card_clicked:CardData=  null
 func _on_card_clicked(card: CardData) -> void:
 	if RunState.ui_locked:
 		return
-	var preview = UpgradePreviewScene.instantiate()
-	add_child(preview)
-	preview.open(card)
-	card_clicked = card
-	preview.confirmed.connect(_apply_upgrade)
+	if card.can_upgrade():
+		var preview = UpgradePreviewScene.instantiate()
+		add_child(preview)
+		preview.open(card)
+		card_clicked = card
+		preview.confirmed.connect(_apply_upgrade)
 
 func _apply_upgrade(card:CardData) -> void:
 	print("card clicked uid: "+ str(card_clicked.uid))

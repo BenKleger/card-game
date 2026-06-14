@@ -24,7 +24,7 @@ func update_display():
 	name_label.text = card_data.card_name
 	energy_cost.text = str(card_data.energy_cost)
 	coin_cost.text = str(card_data.coin_value)
-	description.text = CardLibrary.generate_description(card_data)
+	description.text = ActionLibrary.generate_description(card_data.actions)
 	
 
 

@@ -106,7 +106,7 @@ func offer_cards():
 		return
 
 	for i in range(RunState.card_choices):
-		var card_data = pick_card()
+		var card_data = pick_card().duplicate(true)
 		card_data.uid = CardLibrary.get_next_uid()  # ← assign UID first
 		_offer_card(card_data)                       # ← then instantiate with correct UID
 		RunState.cards_offered.append(card_data)

@@ -1,14 +1,15 @@
 class_name SummonCreature
 extends Control
 
-var card_data: CardData
+var source_card: CardData = null  
 var current_hp: int
-var max_hp: int
+var max_hp:int 
 var block: int = 0
 var effects: Array[Effect] = []
 var takes_aggro: bool = false
 var is_passive: bool = false
 var uid: int = 0
+var summon_data: SummonData = null
 var used_this_turn: bool = false
 
 @onready var hp_label: Label = $StatBox/LabelContainer/HPLabel
@@ -27,20 +28,20 @@ func get_effect(effect_type: GDScript) -> Effect:
 			return effect
 	return null
 
-func setup(data: CardData) -> void:
-	card_data = data
-	current_hp = data.summon_hp
-	max_hp = data.summon_hp
-	takes_aggro = data.takes_aggro
-	is_passive = data.is_passive
-	description_label.text = data.description
+func setup(data: SummonData) -> void:
+	summon_data = data
+	current_hp = data.summon_max_hp
+	max_hp = data.summon_max_hp
+	takes_aggro = data.summon_max_hp
+	is_passive = data.summon_max_hp
+	description_label.text = ActionLibrary.generate_description(data.actions)
 	uid = CardLibrary.get_next_uid()
 	update_stats()
 
 func update_stats() -> void:
 	hp_label.text = str(current_hp)+"/"+str(max_hp)
 	block_label.text = str(block)
-	name_label.text = card_data.card_name if card_data else ""
+	name_label.text = summon_data.summon_name if summon_data else ""
 
 signal clicked(summon: SummonCreature)
 

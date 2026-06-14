@@ -6,8 +6,8 @@ var max_hp: int
 var permanent_block: int = 0
 var block: int = 0
 var effects: Array[Effect]
-@onready var intent_label: Label = $IntentLabel
-@onready var intent_icon: TextureRect = $IntentIcon
+@onready var intent_icon: TextureRect = $StatBox/IntentHBox/IntentIcon
+@onready var intent_label: Label = $StatBox/IntentHBox/IntentLabel
 @onready var name_label: Label = $StatBox/StatHBox/NameLabel  # adjust path to match where you put it
 @onready var effects_container: HBoxContainer = $StatBox/EffectsContainer
 

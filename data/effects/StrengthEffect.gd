@@ -8,5 +8,5 @@ func _init() -> void:
 	proc_on = GlobalEnums.ProcOn.TURN_START
 	is_debuff = false
 
-func proc(owner: Node, from: Node = null) -> void:
+func proc(_owner: Node, _from: Node = null) -> void:
 	pass  # Checked in _attack_target

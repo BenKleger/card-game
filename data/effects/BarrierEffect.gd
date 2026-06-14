@@ -3,7 +3,7 @@ extends Effect
 
 func _init() -> void:
 	name = "Barrier"
-	description = "Permanent block."
+	description = "Gain block at turn start"
 	proc_on = GlobalEnums.ProcOn.NONE
 
 func on_applied(owner: Node) -> void:

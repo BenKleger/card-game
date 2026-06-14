@@ -5,9 +5,10 @@ var draw_pile: Array[CardData] = []
 var discard_pile: Array[CardData] = []
 var exhaust_pile: Array[CardData] = []
 static var hand: Array[CardData] = []
-var summons: Array[CardData] = []
+var summons: Array[SummonData] = []
 
 func initialize(deck: Array[CardData]) -> void:
+	hand.clear() 
 	draw_pile = []
 	for card in deck:
 		var copy = card.duplicate()

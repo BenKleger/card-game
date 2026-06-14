@@ -8,7 +8,8 @@ func _init() -> void:
 	proc_on = GlobalEnums.ProcOn.TURN_START
 	is_debuff = true
 
-func proc(owner: Node, from: Node = null) -> void:
+func proc(owner: Node, _from: Node = null) -> void:
 	owner.current_hp -= stacks
 	owner.update_stats()
-	reduce_stacks(owner,stacks/2)
+	
+	reduce_stacks(owner,stacks/2 if stacks>1 else 1)

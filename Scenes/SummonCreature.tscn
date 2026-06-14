@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://bg8qr2xtwvume" path="res://Scripts/summon_creature.gd" id="1_6x2gg"]
 
 [node name="SummonCreature" type="Control"]
-custom_minimum_size = Vector2(50, 50)
+custom_minimum_size = Vector2(100, 100)
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0

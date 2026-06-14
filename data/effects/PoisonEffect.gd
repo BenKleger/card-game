@@ -8,6 +8,6 @@ func _init() -> void:
 	proc_on = GlobalEnums.ProcOn.TURN_END
 	is_debuff = true
 
-func proc(owner: Node, from: Node = null) -> void:
-	from.current_hp -= stacks
-	from.update_stats()
+func proc(owner: Node, _from: Node = null) -> void:
+	owner.current_hp -= stacks
+	owner.update_stats()

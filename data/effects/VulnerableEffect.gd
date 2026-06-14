@@ -8,5 +8,5 @@ func _init() -> void:
 	proc_on = GlobalEnums.ProcOn.TURN_END
 	is_debuff = true
 
-func proc(owner: Node, from: Node = null) -> void:
+func proc(owner: Node, _from: Node = null) -> void:
 	reduce_stacks(owner)

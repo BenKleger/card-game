@@ -26,28 +26,46 @@ static func gain_block(target: Node, amount: int) -> void:
 		final_amount = floor(final_amount * 0.75)
 	target.block += final_amount
 
-static func resolve_action(
-	source: Node,
-	targets: Array,
-	damage: int,
-	block: int,
-	target_effects: Array[Effect],
-	self_effects: Array[Effect] = []
-) -> void:
+static func execute_action(
+	source:Node,
+	targets:Array,
+	action:CombatAction
+):
+	if action is DamageAction:
+		for target in targets:
+			attack_target(
+				action.amount,
+				target,
+				source
+			)
 
-	for target in targets:
-		if damage > 0:
-			attack_target(damage, target, source)
-		if block > 0:
-			if damage > 0: #Attack card
-				gain_block(source,block)
-			else: # Defence card
-				gain_block(target,block)
-		apply_target_effects(target,target_effects)
-		target.update_stats()
-	apply_source_effects(source, self_effects)
-	source.update_stats()
+	elif action is BlockAction:
+		for target in targets:
+			gain_block(
+				target,
+				action.amount
+			)
 
+	elif action is EffectAction:
+		for target in targets:
+			apply_effect(
+				action.effect,
+				target
+			)
+
+	elif action is KillAction:
+		for target in targets:
+			target.CurrentHP = 0 
+
+	elif action is CoinAction:
+		pass #gain coin
+	
+	elif action is HealAction:
+		for target in targets:
+			target.current_hp = min(target.max_hp, target.current_hp + action.amount)
+	
+	else:
+		print("WTF?")
 static func apply_target_effects(
 	target: Node,
 	target_effects: Array[Effect]

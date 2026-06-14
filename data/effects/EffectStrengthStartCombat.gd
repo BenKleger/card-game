@@ -6,7 +6,7 @@ func _init() -> void:
 	description = "Gain strength at combat start"
 	proc_on = GlobalEnums.ProcOn.START_COMBAT
 
-func proc(owner: Node, from: Node = null) -> void:
+func proc(owner: Node, _from: Node = null) -> void:
 	var strength = EffectStrength.new()
 	strength.stacks = stacks
 	# Apply to owner
