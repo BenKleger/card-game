@@ -12,6 +12,7 @@ static func apply_effect(effect: Effect, target: Node) -> void:
 	# Check if effect of same type already exists — add stacks
 	for existing in target.effects:
 		if existing.get_script() == effect.get_script():
+			effect.on_applied(target)
 			existing.stacks += effect.stacks
 			return
 	# Otherwise add fresh
@@ -55,7 +56,7 @@ static func execute_action(
 
 	elif action is KillAction:
 		for target in targets:
-			target.CurrentHP = 0 
+			target.current_hp = 0 
 
 	elif action is CoinAction:
 		pass #gain coin
@@ -66,21 +67,7 @@ static func execute_action(
 	
 	else:
 		print("WTF?")
-static func apply_target_effects(
-	target: Node,
-	target_effects: Array[Effect]
-):
-	for effect in target_effects:
-		apply_effect(effect.duplicate(), target)
-		
-static func apply_source_effects(
-	source: Node,
-	self_effects: Array[Effect]
-):
-	
-	for effect in self_effects:
-		apply_effect(effect.duplicate(), source)
-	
+
 static func attack_target(damage:int, target:Node, source: Node)->void:
 	#Str
 	for effect in source.effects:
@@ -95,6 +82,7 @@ static func attack_target(damage:int, target:Node, source: Node)->void:
 			break
 	
 	# Vulnerable — target takes more damage
+	
 	for effect in target.effects:
 		if effect is EffectVulnerable:
 			damage = int(damage * 1.5)

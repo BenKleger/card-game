@@ -1,15 +1,16 @@
 [gd_scene load_steps=2 format=3 uid="uid://c2udx2eixpj8h"]
 
-[ext_resource type="Script" uid="uid://bcm6abwlg4kiq" path="res://Scripts/canvas_layer.gd" id="1_8f2av"]
+[ext_resource type="Script" uid="uid://bcm6abwlg4kiq" path="res://Scripts/DeckViewer.gd" id="1_8f2av"]
 
 [node name="DeckViewer" type="CanvasLayer"]
 script = ExtResource("1_8f2av")
 
 [node name="PanelContainer" type="PanelContainer" parent="."]
-anchors_preset = -1
+anchors_preset = 15
 anchor_right = 1.0
-anchor_bottom = 0.05
+anchor_bottom = 1.0
 grow_horizontal = 2
+grow_vertical = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer"]
 layout_mode = 2
@@ -20,18 +21,21 @@ layout_mode = 2
 size_flags_vertical = 0
 
 [node name="Label" type="Label" parent="PanelContainer/VBoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(50, 75)
 layout_mode = 2
 size_flags_horizontal = 6
 size_flags_vertical = 0
 text = "Deck - x Cards"
 
 [node name="CloseButton" type="Button" parent="PanelContainer/VBoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(125, 50)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 0
 text = "Close"
 
 [node name="SortButton" type="Button" parent="PanelContainer/VBoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
 
 [node name="ScrollContainer" type="ScrollContainer" parent="PanelContainer/VBoxContainer"]

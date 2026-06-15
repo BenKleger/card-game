@@ -38,4 +38,6 @@ var mend = _move([AF.heal(GlobalEnums.TargetType.ALL_ALLIES, 12)])
 var cleave = _move([AF.damage(GlobalEnums.TargetType.ALL_ENEMIES, 14)])
 var suture = _move([AF.heal(GlobalEnums.TargetType.SELF, 20)])
 var unravel = _move([AF.damage(GlobalEnums.TargetType.PLAYER, 20)])
-var proclamation = _move([AF.effect(GlobalEnums.TargetType.ALL_ENEMIES, EffectLibrary.frail(5)),AF.effect(GlobalEnums.TargetType.ALL_ENEMIES, EffectLibrary.weak(5)),AF.effect(GlobalEnums.TargetType.ALL_ENEMIES, EffectLibrary.poison(5))])
+var proclamation = _move([AF.effect(GlobalEnums.TargetType.ALL_ENEMIES, EffectLibrary.frail(5)),AF.effect(GlobalEnums.TargetType.ALL_ENEMIES, EffectLibrary.weak(5)),
+#AF.effect(GlobalEnums.TargetType.ALL_ENEMIES, EffectLibrary.poison(5)) #seems a bit too op
+])

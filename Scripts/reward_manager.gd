@@ -21,8 +21,8 @@ func offer_rewards():
 	offer_relics()
 
 var gold: int
-@onready var card_container: HBoxContainer = $Rewards/CardContainer
-@onready var relic_button: Button = $Rewards/RelicButton
+@onready var card_container: HBoxContainer = $Rewards/slot4/CardContainer
+@onready var relic_button: Button = $Rewards/slot2/RelicButton
 func offer_relics() -> void:
 	if RunState.relic_accepted == true:
 		relic_button.queue_free()
@@ -45,10 +45,10 @@ func offer_relics() -> void:
 	var relic = _pick_relic(rarity_weights)
 	if relic:
 		RunState.relics_offered.append(relic)
-		$Rewards/RelicButton.text = relic.relic_name
-		$Rewards/RelicButton.visible = true
+		relic_button.text = relic.relic_name
+		relic_button.visible = true
 	else:
-		$Rewards/RelicButton.visible = false
+		relic_button.visible = false
 
 func _pick_relic(weights: Dictionary) -> RelicData:
 	var total = 0
@@ -66,7 +66,7 @@ func _pick_relic(weights: Dictionary) -> RelicData:
 			return relics[RunState.rng.randi_range(0, relics.size() - 1)]
 	return null
 
-@onready var gold_button: Button = $Rewards/GoldButton
+@onready var gold_button: Button = $Rewards/slot/GoldButton
 
 func offer_gold() -> void:
 	if RunState.gold_accepted:
@@ -93,10 +93,10 @@ func offer_gold() -> void:
 	
 	gold = base_gold + enemy_gold
 	if gold == 0:
-		$Rewards/GoldButton.queue_free()
+		gold_button.queue_free()
 		return
 	else:
-		$Rewards/GoldButton.text = str(gold, " Gold")
+		gold_button.text = str(gold, " Gold")
 	RunState.gold_offered = gold
 
 func offer_cards():
@@ -182,9 +182,9 @@ func _offer_card(card_data:CardData) -> CardData:
 	card.setup(card_data)
 	return card_data
 
-func _on_card_clicked(card: CardData) -> void:
+func _on_card_clicked(card: Card) -> void:
 	
-	select_card(card)
+	select_card(card.card_data)
 
 var selected_card :CardData = null
 
@@ -221,18 +221,18 @@ func _on_gold_button_pressed() -> void:
 	RunState.gold += gold
 	RunState.gold_offered = 0
 	RunState.gold_accepted = true
-	$Rewards/GoldButton.queue_free()
+	gold_button.queue_free()
 
 func _on_relic_button_pressed() -> void:
 	if RunState.relics_offered.is_empty():
-		$Rewards/RelicButton.queue_free()
+		relic_button.queue_free()
 		return
 	
 	var relic = RunState.relics_offered[0]
 	RunState.relics.append(relic)
 	relic.on_collected.call()
 	RunState.relic_accepted = true
-	$Rewards/RelicButton.queue_free()
+	relic_button.queue_free()
 
 
 func _on_map_button_pressed() -> void:

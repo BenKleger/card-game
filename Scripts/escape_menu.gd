@@ -20,12 +20,13 @@ func _on_settings_pressed() -> void:
 
 func _on_exit_run_pressed() -> void:
 	close_requested.emit()
-	
+	RunState.cleanup_overlays()
 	get_tree().change_scene_to_file("res://Scenes/main_menu.tscn")
 
 func _on_abandon_run_pressed() -> void:
 	close_requested.emit()
 	RunState.new_run()
+	RunState.cleanup_overlays()
 	RunState.scene_history.clear()
 	get_tree().change_scene_to_file("res://Scenes/main_menu.tscn")
 	

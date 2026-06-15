@@ -18,7 +18,7 @@ extends Resource
 
 @export var actions: Array[CombatAction] = []
 
-@export var max_upgrades: int = 1
+@export var max_upgrades: int = 5
 var upgrade_level: int = 0
 var in_field: bool = false
 

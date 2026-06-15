@@ -19,14 +19,14 @@ const UpgradePreviewScene = preload("res://Scenes/UpgradePreview.tscn")
 
 var card_clicked:CardData=  null
 
-func _on_card_clicked(card: CardData) -> void:
+func _on_card_clicked(card: Card) -> void:
 	if RunState.ui_locked:
 		return
-	if card.can_upgrade():
+	if card.card_data.can_upgrade():
 		var preview = UpgradePreviewScene.instantiate()
 		add_child(preview)
-		preview.open(card)
-		card_clicked = card
+		preview.open(card.card_data)
+		card_clicked = card.card_data
 		preview.confirmed.connect(_apply_upgrade)
 
 func _apply_upgrade(card:CardData) -> void:

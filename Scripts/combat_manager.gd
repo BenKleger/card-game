@@ -22,6 +22,14 @@ var turn_number: int = 1
 var selected_source = null
 var phase: Phase = Phase.PLAYER_TURN_START
 
+var color_chains := {
+	GlobalEnums.CardColor.RED: 0,
+	GlobalEnums.CardColor.BLUE: 0,
+	GlobalEnums.CardColor.GREEN: 0,
+	GlobalEnums.CardColor.PURPLE: 0,
+}
+
+
 @onready var passive_column: VBoxContainer = $UI/UIHeirarchy/BattleAreaNode/BattleArea/PlayerArea/PassiveColumn
 @onready var neutral_column: VBoxContainer = $UI/UIHeirarchy/BattleAreaNode/BattleArea/PlayerArea/NeutralColumn
 @onready var tank_column: VBoxContainer = $UI/UIHeirarchy/BattleAreaNode/BattleArea/PlayerArea/TankColumn
@@ -38,27 +46,22 @@ func _ready() -> void:
 	for child in $UI/UIHeirarchy/BottomBarNode/BottomBar/HandContainer.get_children():
 		child.queue_free()
 	turn_number = 1
+
 	# setup player
 	player.current_hp = RunState.current_hp
 	player.max_hp = RunState.max_hp
 	player.energy = RunState.max_energy
 	update_player_ui()
-	
+
 	# setup deck
 	deck_manager.initialize(RunState.deck)
 	_update_deck_ui()
 
 	# setup enemies (load from encounter data)
 	_spawn_enemies()
-	
 	_connect_signals()
-	
-	
-	
 	_start_of_combat_player()
 	_start_of_combat_enemy()
-	
-	
 	# start
 	phase = Phase.PLAYER_TURN_START
 	advance_phase()
@@ -94,9 +97,14 @@ func spawn_enemy(enemy_data: EnemyData):
 	enemy_area.add_child(enemy)
 	enemies.append(enemy)
 
-func _on_card_clicked(card: CardData) -> void:
+func _on_card_clicked(card) -> void:
 	# reset all cards to original position first
+	
 	_reset_card_positions()
+	if selected_source is Card:
+		if selected_source.card_data.uid == card.card_data.uid:
+			_clear_selection()
+			return
 	select_card(card)
 
 @onready var end_turn_button: Button = $UI/UIHeirarchy/BottomBarNode/BottomBar/EndTurnButton
@@ -113,12 +121,16 @@ func _connect_signals() -> void:
 var enemy_target: EnemyCreature = null
 var ally_target: Node = null  # PlayerCreature or SummonCreature
 
+func is_selection_complete(src) -> bool:
+	var req = get_required_targets(src)
+	if req.enemy and enemy_target == null: return false
+	if req.ally and ally_target == null: return false
+	return true
 func get_required_targets(src) -> Dictionary:
-	
 	var needs_enemy = false
 	var needs_ally = false
-	if src is CardData:
-		for action in src.actions:
+	if src is Card:
+		for action in src.effective.actions:
 			match action.target_type:
 				GlobalEnums.TargetType.SINGLE_ENEMY: needs_enemy = true
 				GlobalEnums.TargetType.SINGLE_ALLY: needs_ally = true
@@ -132,28 +144,43 @@ func get_required_targets(src) -> Dictionary:
 	else:
 		return {}
 
-func is_selection_complete(src) -> bool:
-	var req = get_required_targets(src)
-	if req.enemy and enemy_target == null: return false
-	if req.ally and ally_target == null: return false
-	return true
 
 func _try_auto_execute() -> void:
-	if selected_source is CardData:
-		if !can_execute(selected_source.actions):
+	if selected_source is Card:
+		if !can_execute(selected_source.effective.actions):
 			selected_source = null
 			#TODO Give a shake :)
 			return 
 		if is_selection_complete(selected_source):
+			if player.energy<selected_source.effective.energy_cost:
+				return
 			_execute_card(selected_source, enemy_target if enemy_target else null, ally_target if ally_target else null)
+			on_card_played(selected_source.effective)
 			_clear_selection()
 	elif selected_source is SummonCreature:
 		if !can_execute(selected_source.summon_data.actions):
 			selected_source = null
+			#TODO Give a shake :)
 			return
 		if is_selection_complete(selected_source):
+			on_card_played(selected_source.source_card)
 			_execute_card(selected_source, enemy_target if enemy_target else null, ally_target if ally_target else null)
 			_clear_selection()
+
+func on_card_played(card: CardData) -> void:
+	if card.color in color_chains:
+		color_chains[card.color] += 1
+	update_hand_chain_displays()
+	
+func update_hand_chain_displays() -> void:
+	for card:Card in hand_container.get_children():
+		if card:
+			card.update_chain_bonus(get_chain_level(card.card_data))
+
+func get_chain_level(card: CardData) -> int:
+	if card.color not in color_chains:
+		return 0
+	return min(color_chains[card.color], 3)
 
 func can_execute(actions:Array[CombatAction]) -> bool:
 	for action in actions:
@@ -171,10 +198,10 @@ func _clear_selection() -> void:
 	enemy_target = null
 	ally_target = null
 	_reset_card_positions()
+	#TODO _reset_summon_positions()
 
-func _on_player_clicked() -> void:
+func _on_player_clicked(_arg) -> void:
 	
-	print("player clicked, selected_source: ", selected_source)
 	if selected_source != null and get_required_targets(selected_source).ally:
 		ally_target = player
 		_try_auto_execute()
@@ -197,11 +224,13 @@ func _on_summon_clicked(summon: SummonCreature) -> void:
 	# nothing selected — clicking own summon triggers ITS action via the same system
 	if phase != Phase.PLAYER_TURN or summon.used_this_turn:
 		return
+	_clear_selection()
 	select_summon(summon)  # summon's card_data becomes the selected action source
 
 func select_summon(summon:SummonCreature):
 	if selected_source == summon:
 		selected_source = null
+		_reset_card_positions()
 		return
 	selected_source = summon
 	_highlight_summon() #TODO
@@ -209,12 +238,13 @@ func select_summon(summon:SummonCreature):
 
 func _highlight_summon():pass #TODO
 
-func select_card(card: CardData) -> void:
+func select_card(card: Card) -> void:
 	if selected_source == card:
 		selected_source = null
+		_reset_card_positions()
 		return
 	selected_source = card
-	_raise_selected_card(card)
+	_raise_selected_card(card.card_data)
 	_try_auto_execute()
 
 @onready var hand_container: HBoxContainer = $UI/UIHeirarchy/BottomBarNode/BottomBar/HandContainer
@@ -269,21 +299,33 @@ func _can_spawn_summon(summon: SummonData) -> bool:
 	var column := _get_summon_column_from_data(summon)
 	return _get_alive_summons_in_column(column).size() < _max_slots_for_column(column)
 
-func spawn_summon(summon_data: SummonData, source_card: CardData) -> void:
+func spawn_summon(summon_data: SummonData, src) -> void:
 	if not _can_spawn_summon(summon_data):
 		return
-	var column := _get_summon_column_from_data(summon_data)
-	var summon = SUMMON_SCENE.instantiate()
-	summon.uid = CardLibrary.get_next_uid()
-	_get_column_container(column).add_child(summon)
-	summon.source_card = source_card 
-	summon.setup(summon_data)
-	deck_manager.summons.append(summon_data)
-	source_card.in_field = true
-	deck_manager.exhaust(source_card)
-	summon.clicked.connect(_on_summon_clicked)
-	summons.append(summon)
-	_remove_card_from_hand(source_card)
+	if src is Card:
+		var column := _get_summon_column_from_data(summon_data)
+		var summon = SUMMON_SCENE.instantiate()
+		summon.uid = CardLibrary.get_next_uid()
+		_get_column_container(column).add_child(summon)
+		summon.source_card = src.card_data
+		summon.effective = src.effective
+		summon.setup(summon_data)
+		deck_manager.summons.append(summon_data)
+		src.card_data.in_field = true
+		deck_manager.exhaust(src.card_data)
+		summon.clicked.connect(_on_summon_clicked)
+		summons.append(summon)
+		_remove_card_from_hand(src.card_data)
+	elif src is SummonCreature:
+		var column := _get_summon_column_from_data(summon_data)
+		var summon = SUMMON_SCENE.instantiate()
+		summon.uid = CardLibrary.get_next_uid()
+		_get_column_container(column).add_child(summon)
+		summon.source_card = src.source_card
+		summon.source_card.returned_on_death = false
+		summon.setup(summon_data)
+		summon.clicked.connect(_on_summon_clicked)
+		summons.append(summon)
 	update_player_ui()
 
 func _is_valid_card_target(target: Node) -> bool:
@@ -294,21 +336,21 @@ func _is_valid_card_target(target: Node) -> bool:
 	)
 
 func _execute_card(src, e_target, a_target) -> void:
-	if src is CardData:
-		if player.energy<src.energy_cost:
-			return
-		player.energy-= src.energy_cost
-		if src.card_type == GlobalEnums.CardType.PERMANENT:
-			deck_manager.discard(src)
-		_remove_card_from_hand(src)
+	if src is Card:
+		
+		player.energy-= src.effective.energy_cost
+		if src.effective.card_type == GlobalEnums.CardType.PERMANENT:
+			deck_manager.discard(src.card_data)
+		_remove_card_from_hand(src.card_data)
+		update_player_ui()
+		execute_actions(player,src.effective.actions,e_target,a_target)
+		return
 	if src is SummonCreature:
 		src.used_this_turn = true
-		execute_actions(player,src.summon_data.actions,e_target,a_target)
+		execute_actions(src,src.summon_data.actions,e_target,a_target)
 		update_player_ui()
+		src.modulate = Color(0.5, 0.5, 0.5)
 		return
-		#TODO Gray out summon as no more actions
-	update_player_ui()
-	execute_actions(player,src.actions,e_target,a_target)
 
 func _remove_card_from_hand(card: CardData) -> void:
 	for child in hand_container.get_children():
@@ -398,12 +440,19 @@ func select_card_by_index(idx: int, field = false) -> void:
 	if !field:
 		if idx >= deck_manager.hand.size():
 			return
-		select_card(deck_manager.hand[idx])
+		select_card(card_by_card_data(deck_manager.hand[idx]))
 		return
 	#in-field card
 	if idx >= deck_manager.summons.size():
 		return
 	select_card(deck_manager.summons[idx].card_data)
+
+func card_by_card_data(card_data:CardData)->Card:
+	for card in hand_container.get_children():
+		if card:
+			if card.card_data.uid == card_data.uid:
+				return card
+	return null
 
 func _draw_cards(n: int) -> void:
 	var effective_max = RunState.max_hand_size + hand_size_modifier
@@ -414,7 +463,7 @@ func _draw_cards(n: int) -> void:
 		var card = CARD_SCENE.instantiate()
 		card.clicked.connect(_on_card_clicked)
 		hand_container.add_child(card)
-		
+		card.chain_bonus = get_chain_level(card_data)
 		card.setup(card_data)
 	_update_deck_ui()
 
@@ -428,7 +477,6 @@ func end_turn() -> void:
 	phase = Phase.PLAYER_TURN_END
 	advance_phase()
 	turn_number += 1
-	
 	CombatEffects.proc_effects(player, GlobalEnums.ProcOn.TURN_END)
 
 func advance_phase() -> void:
@@ -617,9 +665,19 @@ func _get_move_targets(action: CombatAction, enemy) -> Array[Node]:
 			for e in enemies:
 				targets.append(e)
 		GlobalEnums.TargetType.ALL_ENEMIES:
-			targets = _target_all_friendlies()
+			
+			var tank_summons :Array[SummonCreature]= _get_alive_summons_in_column(SummonColumn.TANK)
+			if tank_summons==[]:
+				targets = _target_all_friendlies()
+			else:
+				for summon in tank_summons:
+					targets.append(summon)
 		GlobalEnums.TargetType.PLAYER:
-			targets = [player]
+			var tank_summon :SummonCreature= _get_first_alive_in_column(SummonColumn.TANK)
+			if !tank_summon:
+				targets = [player]
+			else:
+				targets=[tank_summon]
 		GlobalEnums.TargetType.SINGLE_ALLY:
 			#TODO
 			targets = [enemy]
@@ -659,11 +717,20 @@ func _do_player_turn_end():
 	deck_manager.hand.clear()
 	for child in hand_container.get_children():
 		child.queue_free()
-	selected_source = null
+	selected_source = null        
+	_clear_selection()
+	reset_color_chains()
 	_update_deck_ui()
 	for summon in summons.duplicate():
 		CombatEffects.proc_effects(summon, GlobalEnums.ProcOn.TURN_END)
 		summon.update_stats()
+
+
+
+func reset_color_chains() -> void:
+	for color in color_chains:
+		color_chains[color] = 0
+	update_hand_chain_displays()
 
 func _do_enemy_turn_end():
 	for enemy in enemies:

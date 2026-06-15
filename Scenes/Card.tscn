@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://c8admblqsa4tr" path="res://Scripts/card.gd" id="1_pnb5n"]
 
 [node name="Card" type="Control"]
-custom_minimum_size = Vector2(100, 120)
+custom_minimum_size = Vector2(150, 240)
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -45,11 +45,13 @@ theme_override_colors/font_color = Color(0, 0.7764706, 1, 1)
 text = "1"
 
 [node name="NameLabel" type="Label" parent="Container"]
+custom_minimum_size = Vector2(10, 10)
 layout_mode = 2
 size_flags_vertical = 1
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 text = "atk"
 horizontal_alignment = 1
+autowrap_mode = 2
 
 [node name="Description" type="Label" parent="Container"]
 custom_minimum_size = Vector2(25, 25)
@@ -58,4 +60,4 @@ size_flags_vertical = 7
 theme_override_colors/font_color = Color(0.67481464, 0.67481464, 0.6748146, 1)
 text = "3 dmg"
 horizontal_alignment = 1
-autowrap_mode = 3
+autowrap_mode = 2

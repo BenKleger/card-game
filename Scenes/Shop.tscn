@@ -11,60 +11,70 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_kjfcx")
 
-[node name="Label" type="Label" parent="."]
+[node name="Panel" type="Panel" parent="."]
 layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -576.0
-offset_right = 576.0
-offset_bottom = 213.0
+anchors_preset = -1
+anchor_left = 0.05
+anchor_top = 0.1
+anchor_right = 0.95
+anchor_bottom = 0.95
 grow_horizontal = 2
-size_flags_vertical = 7
+grow_vertical = 2
+
+[node name="ShopVBC" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.05
+anchor_top = 0.1
+anchor_right = 0.95
+anchor_bottom = 0.95
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="Label" type="Label" parent="ShopVBC"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
 text = "Shop"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="ShopVBC" type="VBoxContainer" parent="."]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="ShopAreaNode" type="Control" parent="ShopVBC"]
+[node name="CardLabel" type="Label" parent="ShopVBC"]
 layout_mode = 2
-size_flags_vertical = 7
+size_flags_vertical = 0
+theme_override_font_sizes/font_size = 24
+text = "Card Options"
+horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="ShopAreaHBC" type="HBoxContainer" parent="ShopVBC/ShopAreaNode"]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
-
-[node name="ItemVBC" type="VBoxContainer" parent="ShopVBC/ShopAreaNode/ShopAreaHBC"]
+[node name="CenterContainer" type="CenterContainer" parent="ShopVBC"]
 layout_mode = 2
-size_flags_horizontal = 7
-size_flags_vertical = 5
 
-[node name="ItemVBC2" type="VBoxContainer" parent="ShopVBC/ShopAreaNode/ShopAreaHBC"]
+[node name="CardGridContainer" type="GridContainer" parent="ShopVBC/CenterContainer"]
 layout_mode = 2
-size_flags_horizontal = 7
-size_flags_vertical = 5
+size_flags_horizontal = 5
+size_flags_vertical = 3
+columns = 5
 
-[node name="ItemVBC3" type="VBoxContainer" parent="ShopVBC/ShopAreaNode/ShopAreaHBC"]
+[node name="RelicLabel" type="Label" parent="ShopVBC"]
 layout_mode = 2
-size_flags_horizontal = 7
-size_flags_vertical = 5
+theme_override_font_sizes/font_size = 24
+text = "Relic Options"
+horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="ItemVBC4" type="VBoxContainer" parent="ShopVBC/ShopAreaNode/ShopAreaHBC"]
+[node name="RelicHBoxContainer" type="HBoxContainer" parent="ShopVBC"]
 layout_mode = 2
-size_flags_horizontal = 7
-size_flags_vertical = 5
+size_flags_horizontal = 5
+size_flags_vertical = 3
+alignment = 1
 
 [node name="continue" type="Button" parent="ShopVBC"]
 layout_mode = 2
-size_flags_vertical = 7
+size_flags_horizontal = 4
+size_flags_vertical = 0
+theme_override_font_sizes/font_size = 24
 text = "Continue"
 
 [connection signal="pressed" from="ShopVBC/continue" to="." method="_on_continue_pressed"]

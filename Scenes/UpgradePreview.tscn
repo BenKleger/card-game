@@ -19,6 +19,7 @@ offset_bottom = 40.0
 layout_mode = 2
 
 [node name="TitleLabel" type="Label" parent="PanelContainer/VBoxContainer"]
+custom_minimum_size = Vector2(200, 150)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 6
@@ -49,12 +50,14 @@ size_flags_vertical = 5
 layout_mode = 2
 
 [node name="ConfirmButton" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer2"]
+custom_minimum_size = Vector2(50, 100)
 layout_mode = 2
 size_flags_horizontal = 7
 size_flags_vertical = 5
 text = "Confirm Upgrade"
 
 [node name="CancelButton" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer2"]
+custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
 size_flags_horizontal = 7
 size_flags_vertical = 5

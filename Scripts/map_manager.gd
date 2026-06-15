@@ -173,6 +173,7 @@ func _on_node_pressed(node_index: int) -> void:
 			RunState.push_scene("res://Scenes/rest.tscn")
 		_:
 			push_warning("Node type not yet implemented: " + str(node.type))
+	RunState.rng_state= RunState.rng.get_state()
 
 func _on_close_pressed() -> void:
 	if preview_mode:

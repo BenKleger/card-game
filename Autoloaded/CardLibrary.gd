@@ -20,13 +20,16 @@ func get_cards_by_color(color: GlobalEnums.CardColor) -> Array[CardData]:
 	return non_starter_cards().filter(func(c): return c.color == color)
 
 func _build_cards() -> void: #TODO Overhaul to also accept upgrades
+	
+	
+	
 	var defend = _card(
 		"Defend",
 		1,
-		GlobalEnums.CardColor.BLUE,
+		GlobalEnums.CardColor.BLACK,
 		GlobalEnums.CardRarity.COMMON,
 		[
-			AF.block(GlobalEnums.TargetType.SELF, 5, 3)
+			AF.block(GlobalEnums.TargetType.SINGLE_ALLY, 5, 3)
 		]
 	)
 	
@@ -36,7 +39,7 @@ func _build_cards() -> void: #TODO Overhaul to also accept upgrades
 	var strike = _card(
 		"Strike",
 		1,
-		GlobalEnums.CardColor.RED,
+		GlobalEnums.CardColor.BLACK,
 		GlobalEnums.CardRarity.COMMON,
 		[
 			AF.damage(GlobalEnums.TargetType.SINGLE_ENEMY, 6, 3)
@@ -195,7 +198,7 @@ func _build_cards() -> void: #TODO Overhaul to also accept upgrades
 		GlobalEnums.CardRarity.LEGENDARY,
 		[
 			AF.block(GlobalEnums.TargetType.SELF, 20, 6),
-			AF.effect(GlobalEnums.TargetType.SELF, EffectLibrary.regen(4), 1),
+			AF.effect(GlobalEnums.TargetType.SELF, EffectLibrary.regen(4),2),
 		]
 	))
 	
@@ -293,7 +296,6 @@ func _build_cards() -> void: #TODO Overhaul to also accept upgrades
 			AF.effect(GlobalEnums.TargetType.SINGLE_ENEMY, EffectLibrary.weak(1),1),
 		]
 	))
-	
 	all_cards.append(_card("Shatter",
 		2,
 		GlobalEnums.CardColor.PURPLE,
@@ -333,7 +335,7 @@ func _build_cards() -> void: #TODO Overhaul to also accept upgrades
 		GlobalEnums.CardRarity.COMMON,
 		[
 			AF.summon(GlobalEnums.TargetType.SUMMON_ALLY,
-			_summon("Flagellant", 2, [
+			_summon("Flagellant", 8, [
 				AF.damage(GlobalEnums.TargetType.SINGLE_ENEMY,6,2),
 				AF.effect(GlobalEnums.TargetType.SINGLE_ENEMY,EffectLibrary.bleed(1), 1)
 				], false, false)),
@@ -419,7 +421,7 @@ func _build_cards() -> void: #TODO Overhaul to also accept upgrades
 		GlobalEnums.CardRarity.RARE,
 		[
 			AF.summon(GlobalEnums.TargetType.SUMMON_ALLY,
-			_summon("Marrow Thresher", 6, [
+			_summon("Marrow Thresher", 10, [
 				AF.damage(GlobalEnums.TargetType.SINGLE_ENEMY,10,3),
 				], false, false)),
 		], 
@@ -433,130 +435,571 @@ func _build_cards() -> void: #TODO Overhaul to also accept upgrades
 		GlobalEnums.CardRarity.RARE,
 		[
 			AF.summon(GlobalEnums.TargetType.SUMMON_ALLY,
-			_summon("Gore Hound Pack", 4, [
-				AF.damage(GlobalEnums.TargetType.SINGLE_ENEMY,10,3),
+			_summon("Gore Hound Pack", 8, [
+				AF.damage(GlobalEnums.TargetType.ALL_ENEMIES,5,2),
 				], false, false)),
 		], 
 		0,
 		GlobalEnums.CardType.FIELD
 	))
 	
-	#all_cards.append(_card("Gore Hound Pack", 2, GlobalEnums.CardColor.RED, GlobalEnums.CardRarity.RARE,
-		#CardData.TargetType.ALL_ENEMIES, 3, 0, 0, 0, 0, [], GlobalEnums.CardType.FIELD))
-#
-	#all_cards.append(_card("The Unforgiven", 3, GlobalEnums.CardColor.RED, GlobalEnums.CardRarity.RARE,
-		#CardData.TargetType.SINGLE_ENEMY, 8, 0, 0, 0, 0, [_bleed(2)], GlobalEnums.CardType.FIELD))
-#
-	#all_cards.append(_card("Revenant Blade", 2, GlobalEnums.CardColor.RED, GlobalEnums.CardRarity.RARE,
-		#CardData.TargetType.SINGLE_ENEMY, 5, 0, 0, 0, 0, [_weak(1)], GlobalEnums.CardType.FIELD))
-#
-	#all_cards.append(_card("Ashen Berserker", 4, GlobalEnums.CardColor.RED, GlobalEnums.CardRarity.LEGENDARY,
-		#CardData.TargetType.ALL_ENEMIES, 8, 0, 0, 0, 0, [_bleed(2)], GlobalEnums.CardType.FIELD))
-#
-	#all_cards.append(_card("The Devourer", 5, GlobalEnums.CardColor.RED, GlobalEnums.CardRarity.LEGENDARY,
-		#CardData.TargetType.SINGLE_ENEMY, 20, 0, 0, 0, 0, [_bleed(3), _weak(2)], GlobalEnums.CardType.FIELD))
+	all_cards.append(_card("Summon The Unforgiven",
+		3,
+		GlobalEnums.CardColor.RED,
+		GlobalEnums.CardRarity.RARE,
+		[
+			AF.summon(GlobalEnums.TargetType.SUMMON_ALLY,
+			_summon("The Unforgiven", 12, [
+				AF.damage(GlobalEnums.TargetType.SINGLE_ENEMY,8,3),
+				AF.effect(GlobalEnums.TargetType.SINGLE_ENEMY, EffectLibrary.bleed(2),1),
+				], false, false)),
+		], 
+		1,
+		GlobalEnums.CardType.FIELD
+	))
+	
+	all_cards.append(_card("Summon Revenant Blade",
+		2,
+		GlobalEnums.CardColor.RED,
+		GlobalEnums.CardRarity.RARE,
+		[
+			AF.summon(GlobalEnums.TargetType.SUMMON_ALLY,
+			_summon("Revenant Blade", 8, [
+				AF.damage(GlobalEnums.TargetType.SINGLE_ENEMY,5,2),
+				AF.block(GlobalEnums.TargetType.SELF,5,2),
+				AF.effect(GlobalEnums.TargetType.SINGLE_ENEMY, EffectLibrary.weak(1),1),
+				], false, false)),
+		], 
+		1,
+		GlobalEnums.CardType.FIELD
+	))
+	
+	all_cards.append(_card("Summon Ashen Berserker",
+		4,
+		GlobalEnums.CardColor.RED,
+		GlobalEnums.CardRarity.LEGENDARY,
+		[
+			AF.summon(GlobalEnums.TargetType.SUMMON_ALLY,
+			_summon("Ashen Berserker", 8, [
+				AF.damage(GlobalEnums.TargetType.ALL_ENEMIES,8,3),
+				AF.effect(GlobalEnums.TargetType.SELF, EffectLibrary.barrier(2),1),
+				AF.effect(GlobalEnums.TargetType.ALL_ENEMIES, EffectLibrary.bleed(2),2),
+				], false, false)),
+		], 
+		1,
+		GlobalEnums.CardType.FIELD
+	))
+	
+	all_cards.append(_card("Summon The Devourer",
+		5,
+		GlobalEnums.CardColor.RED,
+		GlobalEnums.CardRarity.LEGENDARY,
+		[
+			AF.summon(GlobalEnums.TargetType.SUMMON_ALLY,
+			_summon("The Devourer", 13, [
+				AF.damage(GlobalEnums.TargetType.SINGLE_ENEMY,20,5),
+				AF.effect(GlobalEnums.TargetType.SINGLE_ENEMY, EffectLibrary.bleed(3),2),
+				AF.effect(GlobalEnums.TargetType.SINGLE_ENEMY, EffectLibrary.weak(2),1),
+				AF.effect(GlobalEnums.TargetType.SELF, EffectLibrary.regen(5),2),
+				], false, false)),
+		], 
+		1,
+		GlobalEnums.CardType.FIELD
+	))
+	
 #
 	## --- FIELD CARDS: DEFENSIVE (BLUE) ---
-	#all_cards.append(_card("Shield Warden", 1, GlobalEnums.CardColor.BLUE, GlobalEnums.CardRarity.COMMON,
-		#CardData.TargetType.SELF, 0, 4, 0, 0, 0, [], GlobalEnums.CardType.FIELD))
-#
-	#all_cards.append(_card("Bone Wall", 2, GlobalEnums.CardColor.BLUE, GlobalEnums.CardRarity.COMMON,
-		#CardData.TargetType.SELF, 0, 6, 0, 0, 0, [], GlobalEnums.CardType.FIELD))
-#
-	#all_cards.append(_card("Sutured Guard", 1, GlobalEnums.CardColor.BLUE, GlobalEnums.CardRarity.COMMON,
-		#CardData.TargetType.SELF, 0, 3, 0, 0, 0, [_regen(1)], GlobalEnums.CardType.FIELD))
-#
-	#all_cards.append(_card("Ash Sentinel", 2, GlobalEnums.CardColor.BLUE, GlobalEnums.CardRarity.COMMON,
-		#CardData.TargetType.SELF, 0, 5, 0, 0, 0, [], GlobalEnums.CardType.FIELD))
-#
-	#all_cards.append(_card("Hollow Knight", 2, GlobalEnums.CardColor.BLUE, GlobalEnums.CardRarity.RARE,
-		#CardData.TargetType.SELF, 0, 8, 0, 0, 0, [_regen(1)], GlobalEnums.CardType.FIELD))
-#
-	#all_cards.append(_card("Iron Penitent", 3, GlobalEnums.CardColor.BLUE, GlobalEnums.CardRarity.RARE,
-		#CardData.TargetType.SELF, 0, 12, 0, 0, 0, [], GlobalEnums.CardType.FIELD))
-#
-	#all_cards.append(_card("The Unbroken", 3, GlobalEnums.CardColor.BLUE, GlobalEnums.CardRarity.RARE,
-		#CardData.TargetType.SELF, 2, 8, 0, 0, 0, [], GlobalEnums.CardType.FIELD))
-#
-	#all_cards.append(_card("Grave Bulwark", 2, GlobalEnums.CardColor.BLUE, GlobalEnums.CardRarity.RARE,
-		#CardData.TargetType.SELF, 0, 7, 0, 0, 0, [_regen(2)], GlobalEnums.CardType.FIELD))
-#
-	#all_cards.append(_card("The Last Rampart", 4, GlobalEnums.CardColor.BLUE, GlobalEnums.CardRarity.LEGENDARY,
-		#CardData.TargetType.SELF, 0, 18, 0, 0, 0, [_regen(3)], GlobalEnums.CardType.FIELD))
-#
-	#all_cards.append(_card("Deathless Warden", 5, GlobalEnums.CardColor.BLUE, GlobalEnums.CardRarity.LEGENDARY,
-		#CardData.TargetType.SELF, 0, 24, 0, 0, 0, [_regen(4)], GlobalEnums.CardType.FIELD))
-#
+	all_cards.append(_card("Summon Shield Warden",
+		1,
+		GlobalEnums.CardColor.BLUE,
+		GlobalEnums.CardRarity.COMMON,
+		[
+			AF.summon(GlobalEnums.TargetType.SUMMON_ALLY,
+			_summon("Shield Warden", 8, [
+				AF.block(GlobalEnums.TargetType.PLAYER, 4,2),
+				], false, true)),
+		], 
+		0,
+		GlobalEnums.CardType.FIELD
+	))
+
+	all_cards.append(_card("Summon Bone Wall",
+		2,
+		GlobalEnums.CardColor.BLUE,
+		GlobalEnums.CardRarity.COMMON,
+		[
+			AF.summon(GlobalEnums.TargetType.SUMMON_ALLY,
+			_summon("Bone Wall", 10, [
+				AF.block(GlobalEnums.TargetType.SELF, 6,3),
+				], true, false)),
+		], 
+		0,
+		GlobalEnums.CardType.FIELD
+	))
+
+	all_cards.append(_card("Summon Sutured Guard",
+		1,
+		GlobalEnums.CardColor.BLUE,
+		GlobalEnums.CardRarity.COMMON,
+		[
+			AF.summon(GlobalEnums.TargetType.SUMMON_ALLY,
+			_summon("Sutured Guard", 6, [
+				AF.block(GlobalEnums.TargetType.SINGLE_ALLY, 3,1),
+				AF.effect(GlobalEnums.TargetType.SINGLE_ALLY, EffectLibrary.regen(1), 1),
+				], true, false)),
+		], 
+		0,
+		GlobalEnums.CardType.FIELD
+	))
+	
+	all_cards.append(_card("Summon Ash Sentinel",
+		2,
+		GlobalEnums.CardColor.BLUE,
+		GlobalEnums.CardRarity.COMMON,
+		[
+			AF.summon(GlobalEnums.TargetType.SUMMON_ALLY,
+			_summon("Ash Sentinel", 6, [
+				AF.block(GlobalEnums.TargetType.SINGLE_ALLY, 6,2),
+				], true, false)),
+		], 
+		0,
+		GlobalEnums.CardType.FIELD
+	))
+	
+	all_cards.append(_card("Summon Hollow Knight",
+		2,
+		GlobalEnums.CardColor.BLUE,
+		GlobalEnums.CardRarity.RARE,
+		[
+			AF.summon(GlobalEnums.TargetType.SUMMON_ALLY,
+			_summon("Hollow Knight", 12, [
+				AF.block(GlobalEnums.TargetType.SINGLE_ALLY, 6,3),
+				AF.effect(GlobalEnums.TargetType.SINGLE_ALLY, EffectLibrary.barrier(2), 1),
+				], true, false)),
+		], 
+		0,
+		GlobalEnums.CardType.FIELD
+	))
+	
+	all_cards.append(_card("Summon Iron Penitent",
+		3,
+		GlobalEnums.CardColor.BLUE,
+		GlobalEnums.CardRarity.RARE,
+		[
+			AF.summon(GlobalEnums.TargetType.SUMMON_ALLY,
+			_summon("Iron Penitent", 14, [
+				AF.block(GlobalEnums.TargetType.SINGLE_ALLY, 12,5),
+				], true, false)),
+		], 
+		0,
+		GlobalEnums.CardType.FIELD
+	))
+
+	all_cards.append(_card("Summon The Unbroken",
+		3,
+		GlobalEnums.CardColor.BLUE,
+		GlobalEnums.CardRarity.RARE,
+		[
+			AF.summon(GlobalEnums.TargetType.SUMMON_ALLY,
+			_summon("The Unbroken", 16, [
+				AF.damage(GlobalEnums.TargetType.SINGLE_ENEMY, 4,2),
+				AF.block(GlobalEnums.TargetType.SELF, 8,3),
+				], true, false)),
+		], 
+		0,
+		GlobalEnums.CardType.FIELD
+	))
+	
+	all_cards.append(_card("Summon Grave Bulwark",
+		2,
+		GlobalEnums.CardColor.BLUE,
+		GlobalEnums.CardRarity.RARE,
+		[
+			AF.summon(GlobalEnums.TargetType.SUMMON_ALLY,
+			_summon("Grave Bulwark", 8, [
+				AF.effect(GlobalEnums.TargetType.SINGLE_ALLY, EffectLibrary.regen(2), 1),
+				AF.block(GlobalEnums.TargetType.SINGLE_ALLY, 8,3),
+				], false, true)),
+		], 
+		0,
+		GlobalEnums.CardType.FIELD
+	))
+	all_cards.append(_card("Summon The Last Rampart",
+		4,
+		GlobalEnums.CardColor.BLUE,
+		GlobalEnums.CardRarity.LEGENDARY,
+		[
+			AF.summon(GlobalEnums.TargetType.SUMMON_ALLY,
+			_summon("The Last Rampart", 20, [
+				AF.effect(GlobalEnums.TargetType.SINGLE_ALLY, EffectLibrary.regen(3), 1),
+				AF.block(GlobalEnums.TargetType.SINGLE_ALLY, 18,4),
+				], false, true)),
+		], 
+		0,
+		GlobalEnums.CardType.FIELD
+	))
+	
+	all_cards.append(_card("Summon Deathless Warden",
+		5,
+		GlobalEnums.CardColor.BLUE,
+		GlobalEnums.CardRarity.LEGENDARY,
+		[
+			AF.summon(GlobalEnums.TargetType.SUMMON_ALLY,
+			_summon("Deathless Warden", 28, [
+				AF.effect(GlobalEnums.TargetType.SINGLE_ALLY, EffectLibrary.regen(4), 2),
+				AF.block(GlobalEnums.TargetType.SINGLE_ALLY, 24,6),
+				], false, true)),
+		], 
+		0,
+		GlobalEnums.CardType.FIELD
+	))
+	
+	
+	all_cards.append(_card("Summon Goon Cart",
+		4,
+		GlobalEnums.CardColor.BLUE,
+		GlobalEnums.CardRarity.LEGENDARY,
+		[
+			AF.summon(GlobalEnums.TargetType.SUMMON_ALLY,
+			_summon("Goon Cart", 15, [
+				AF.summon(GlobalEnums.TargetType.SUMMON_ALLY,
+				_summon("Goon", 5, [
+					AF.damage(GlobalEnums.TargetType.SINGLE_ENEMY, 5, 2)
+				],true,false, 2,false)),
+				], false, true, 5)),
+				
+		], 
+		0,
+		GlobalEnums.CardType.FIELD
+	))
 	## --- FIELD CARDS: UTILITY (GREEN) ---
-	#all_cards.append(_card("Crow Scout", 1, GlobalEnums.CardColor.GREEN, GlobalEnums.CardRarity.COMMON,
-		#CardData.TargetType.NONE, 0, 0, 1, 0, 0, [], GlobalEnums.CardType.FIELD))
+	
+	all_cards.append(_card("Summon Crow Scout",
+		1,
+		GlobalEnums.CardColor.GREEN,
+		GlobalEnums.CardRarity.COMMON,
+		[
+			AF.summon(GlobalEnums.TargetType.SUMMON_ALLY,
+			_summon("Crow Scout", 4, [
+				AF.draw(GlobalEnums.TargetType.PLAYER, 1,1),
+				], false, false)),
+		], 
+		0,
+		GlobalEnums.CardType.FIELD
+	))
+	
+	all_cards.append(_card("Summon Scrap Hoarder",
+		1,
+		GlobalEnums.CardColor.GREEN,
+		GlobalEnums.CardRarity.COMMON,
+		[
+			AF.summon(GlobalEnums.TargetType.SUMMON_ALLY,
+			_summon("Scrap Hoarder", 4, [
+				AF.gain_energy(GlobalEnums.TargetType.PLAYER, 1,1),
+				], false, false)),
+		], 
+		0,
+		GlobalEnums.CardType.FIELD
+	))
+	
+	all_cards.append(_card("Summon Remnant Tinkerer",
+		2,
+		GlobalEnums.CardColor.GREEN,
+		GlobalEnums.CardRarity.COMMON,
+		[
+			AF.summon(GlobalEnums.TargetType.SUMMON_ALLY,
+			_summon("Remnant Tinkerer", 7, [
+				AF.draw(GlobalEnums.TargetType.PLAYER, 2,1),
+				], false, true)),
+		], 
+		0,
+		GlobalEnums.CardType.FIELD
+	))
 #
-	#all_cards.append(_card("Scrap Hoarder", 1, GlobalEnums.CardColor.GREEN, GlobalEnums.CardRarity.COMMON,
-		#CardData.TargetType.NONE, 0, 0, 0, 1, 0, [], GlobalEnums.CardType.FIELD))
+	all_cards.append(_card("Summon Void Siphon",
+		3,
+		GlobalEnums.CardColor.GREEN,
+		GlobalEnums.CardRarity.COMMON,
+		[
+			AF.summon(GlobalEnums.TargetType.SUMMON_ALLY,
+			_summon("Void Siphon", 8, [
+				AF.gain_energy(GlobalEnums.TargetType.PLAYER, 2,1),
+				], false, true)),
+		], 
+		0,
+		GlobalEnums.CardType.FIELD
+	))
+	
+	all_cards.append(_card("Summon Battleground Salvager",
+		2,
+		GlobalEnums.CardColor.GREEN,
+		GlobalEnums.CardRarity.RARE,
+		[
+			AF.summon(GlobalEnums.TargetType.SUMMON_ALLY,
+			_summon("Battleground Salvager", 8, [
+				AF.draw(GlobalEnums.TargetType.PLAYER, 1,1),
+				AF.block(GlobalEnums.TargetType.SELF, 5,2),
+				], true, false)),
+		], 
+		0,
+		GlobalEnums.CardType.FIELD
+	))
+	
+	all_cards.append(_card("Summon Bone Harvester",
+		3,
+		GlobalEnums.CardColor.GREEN,
+		GlobalEnums.CardRarity.RARE,
+		[
+			AF.summon(GlobalEnums.TargetType.SUMMON_ALLY,
+			_summon("Bone Harvester", 10, [
+				AF.draw(GlobalEnums.TargetType.PLAYER, 2,1),
+				AF.gain_energy(GlobalEnums.TargetType.PLAYER, 1,1),
+				], false, false)),
+		], 
+		0,
+		GlobalEnums.CardType.FIELD
+	))
+	
+	all_cards.append(_card("Summon The Chronicler",
+		2,
+		GlobalEnums.CardColor.GREEN,
+		GlobalEnums.CardRarity.RARE,
+		[
+			AF.summon(GlobalEnums.TargetType.SUMMON_ALLY,
+			_summon("The Chronicler", 4, [
+				AF.draw(GlobalEnums.TargetType.PLAYER, 3,1),
+				], false, true)),
+		], 
+		0,
+		GlobalEnums.CardType.FIELD
+	))
+	
+	all_cards.append(_card("Summon Eternal Scavenger",
+		4,
+		GlobalEnums.CardColor.GREEN,
+		GlobalEnums.CardRarity.LEGENDARY,
+		[
+			AF.summon(GlobalEnums.TargetType.SUMMON_ALLY,
+			_summon("Eternal Scavenger", 12, [
+				AF.draw(GlobalEnums.TargetType.PLAYER, 3,1),
+				AF.gain_energy(GlobalEnums.TargetType.PLAYER, 2,1),
+				], false, true, 3)),
+		], 
+		0,
+		GlobalEnums.CardType.FIELD
+	))
+
+	all_cards.append(_card("Summon The Archivist",
+		5,
+		GlobalEnums.CardColor.GREEN,
+		GlobalEnums.CardRarity.LEGENDARY,
+		[
+			AF.summon(GlobalEnums.TargetType.SUMMON_ALLY,
+			_summon("The Archivist", 10, [
+				AF.draw(GlobalEnums.TargetType.PLAYER, 4,1),
+				AF.gain_energy(GlobalEnums.TargetType.PLAYER, 2,1),
+				], false, true, 4)),
+		], 
+		0,
+		GlobalEnums.CardType.FIELD
+	))
 #
-	#all_cards.append(_card("Ash Wanderer", 2, GlobalEnums.CardColor.GREEN, GlobalEnums.CardRarity.COMMON,
-		#CardData.TargetType.NONE, 0, 0, 1, 0, 0, [], GlobalEnums.CardType.FIELD))
-#
-	#all_cards.append(_card("Remnant Tinkerer", 2, GlobalEnums.CardColor.GREEN, GlobalEnums.CardRarity.COMMON,
-		#CardData.TargetType.NONE, 0, 0, 2, 0, 0, [], GlobalEnums.CardType.FIELD))
-#
-	#all_cards.append(_card("Void Siphon", 2, GlobalEnums.CardColor.GREEN, GlobalEnums.CardRarity.RARE,
-		#CardData.TargetType.NONE, 0, 0, 0, 2, 0, [], GlobalEnums.CardType.FIELD))
-#
-	#all_cards.append(_card("Ruin Salvager", 2, GlobalEnums.CardColor.GREEN, GlobalEnums.CardRarity.RARE,
-		#CardData.TargetType.NONE, 0, 2, 1, 0, 0, [], GlobalEnums.CardType.FIELD))
-#
-	#all_cards.append(_card("Bone Harvester", 3, GlobalEnums.CardColor.GREEN, GlobalEnums.CardRarity.RARE,
-		#CardData.TargetType.NONE, 0, 0, 2, 1, 0, [], GlobalEnums.CardType.FIELD))
-#
-	#all_cards.append(_card("The Chronicler", 2, GlobalEnums.CardColor.GREEN, GlobalEnums.CardRarity.RARE,
-		#CardData.TargetType.NONE, 0, 0, 3, 0, 0, [], GlobalEnums.CardType.FIELD))
-#
-	#all_cards.append(_card("Eternal Scavenger", 4, GlobalEnums.CardColor.GREEN, GlobalEnums.CardRarity.LEGENDARY,
-		#CardData.TargetType.NONE, 0, 0, 3, 2, 0, [], GlobalEnums.CardType.FIELD))
-#
-	#all_cards.append(_card("The Archivist", 5, GlobalEnums.CardColor.GREEN, GlobalEnums.CardRarity.LEGENDARY,
-		#CardData.TargetType.NONE, 0, 0, 4, 2, 0, [], GlobalEnums.CardType.FIELD))
+	all_cards.append(_card("Summon The Archivist",
+		5,
+		GlobalEnums.CardColor.PURPLE,
+		GlobalEnums.CardRarity.COMMON,
+		[
+			AF.summon(GlobalEnums.TargetType.SUMMON_ALLY,
+			_summon("The Archivist", 10, [
+				AF.draw(GlobalEnums.TargetType.PLAYER, 4,1),
+				AF.gain_energy(GlobalEnums.TargetType.PLAYER, 2,1),
+				], false, true, 4)),
+		], 
+		0,
+		GlobalEnums.CardType.FIELD
+	))
 #
 	## --- FIELD CARDS: CURSED (PURPLE) ---
-	#all_cards.append(_card("Festering Thrall", 1, GlobalEnums.CardColor.PURPLE, GlobalEnums.CardRarity.COMMON,
-		#CardData.TargetType.SINGLE_ENEMY, 5, 0, 0, 0, 0, [_bleed_self(1)], GlobalEnums.CardType.FIELD))
-#
-	#all_cards.append(_card("Hollow Vessel", 1, GlobalEnums.CardColor.PURPLE, GlobalEnums.CardRarity.COMMON,
-		#CardData.TargetType.ALL_ENEMIES, 0, 0, 0, 0, 0, [_vulnerable(1)], GlobalEnums.CardType.FIELD))
-#
-	#all_cards.append(_card("Spite Engine", 2, GlobalEnums.CardColor.PURPLE, GlobalEnums.CardRarity.COMMON,
-		#CardData.TargetType.ALL_ENEMIES, 3, 0, 0, 0, 0, [_weak(1)], GlobalEnums.CardType.FIELD))
-#
-	#all_cards.append(_card("Rotting Prophet", 2, GlobalEnums.CardColor.PURPLE, GlobalEnums.CardRarity.COMMON,
-		#CardData.TargetType.SINGLE_ENEMY, 4, 0, 0, 0, 0, [_vulnerable(1), _bleed_self(1)], GlobalEnums.CardType.FIELD))
-#
-	#all_cards.append(_card("Plague Engine", 3, GlobalEnums.CardColor.PURPLE, GlobalEnums.CardRarity.RARE,
-		#CardData.TargetType.ALL_ENEMIES, 0, 0, 0, 0, 0, [_bleed(2), _weak(1)], GlobalEnums.CardType.FIELD))
-#
-	#all_cards.append(_card("Desecrator", 3, GlobalEnums.CardColor.PURPLE, GlobalEnums.CardRarity.RARE,
-		#CardData.TargetType.ALL_ENEMIES, 4, 0, 0, 0, 0, [_vulnerable(2)], GlobalEnums.CardType.FIELD))
-#
-	#all_cards.append(_card("The Withered", 2, GlobalEnums.CardColor.PURPLE, GlobalEnums.CardRarity.RARE,
-		#CardData.TargetType.SINGLE_ENEMY, 6, 0, 0, 0, 0, [_weak(2), _bleed_self(2)], GlobalEnums.CardType.FIELD))
-#
-	#all_cards.append(_card("Abyssal Anchor", 3, GlobalEnums.CardColor.PURPLE, GlobalEnums.CardRarity.RARE,
-		#CardData.TargetType.ALL_ENEMIES, 0, 0, 0, 0, 0, [_vulnerable(2), _weak(2)], GlobalEnums.CardType.FIELD))
-#
-	#all_cards.append(_card("The Unraveling", 5, GlobalEnums.CardColor.PURPLE, GlobalEnums.CardRarity.LEGENDARY,
-		#CardData.TargetType.ALL_ENEMIES, 6, 0, 0, 0, 0, [_bleed(3), _vulnerable(3), _weak(2)], GlobalEnums.CardType.FIELD))
-#
-	#all_cards.append(_card("Void Incarnate", 5, GlobalEnums.CardColor.PURPLE, GlobalEnums.CardRarity.LEGENDARY,
-		#CardData.TargetType.ALL_ENEMIES, 0, 0, 0, 0, 0, [_bleed(4), _vulnerable(4), _weak(3), _bleed_self(3)], GlobalEnums.CardType.FIELD))
+	
+	
+	all_cards.append(_card("Power Word Kill",
+		3,
+		GlobalEnums.CardColor.PURPLE,
+		GlobalEnums.CardRarity.LEGENDARY,
+		[
+			AF.kill(GlobalEnums.TargetType.SINGLE_ENEMY),
+			AF.effect(GlobalEnums.TargetType.SELF, EffectLibrary.poison(10)),
+		],
+		1
+	))
+		
+	all_cards.append(_card("Summon Festering Thrall",
+		1,
+		GlobalEnums.CardColor.PURPLE,
+		GlobalEnums.CardRarity.COMMON,
+		[
+			AF.summon(GlobalEnums.TargetType.SUMMON_ALLY,
+			_summon("Festering Thrall", 10, [
+				AF.damage(GlobalEnums.TargetType.SINGLE_ENEMY, 5, 2),
+				AF.effect(GlobalEnums.TargetType.SELF, EffectLibrary.bleed(1)),
+				], false, false, 2)),
+		], 
+		0,
+		GlobalEnums.CardType.FIELD
+	))
+	
+	all_cards.append(_card("Summon Hollow Vessel",
+		1,
+		GlobalEnums.CardColor.PURPLE,
+		GlobalEnums.CardRarity.COMMON,
+		[
+			AF.summon(GlobalEnums.TargetType.SUMMON_ALLY,
+			_summon("Hollow Vessel", 8, [
+				AF.effect(GlobalEnums.TargetType.ALL_ENEMIES, EffectLibrary.vulnerable(1)),
+				], false, false, 2)),
+		], 
+		0,
+		GlobalEnums.CardType.FIELD
+	))
+	
+	all_cards.append(_card("Summon Spite Engine",
+		2,
+		GlobalEnums.CardColor.PURPLE,
+		GlobalEnums.CardRarity.COMMON,
+		[
+			AF.summon(GlobalEnums.TargetType.SUMMON_ALLY,
+			_summon("Spite Engine", 8, [
+				AF.damage(GlobalEnums.TargetType.ALL_ENEMIES, 3,1),
+				AF.effect(GlobalEnums.TargetType.ALL_ENEMIES, EffectLibrary.weak(1),1),
+				], false, false, 2)),
+		], 
+		0,
+		GlobalEnums.CardType.FIELD
+	))
+	
+	all_cards.append(_card("Summon Rotting Prophet",
+		2,
+		GlobalEnums.CardColor.PURPLE,
+		GlobalEnums.CardRarity.COMMON,
+		[
+			AF.summon(GlobalEnums.TargetType.SUMMON_ALLY,
+			_summon("Rotting Prophet", 12, [
+				AF.damage(GlobalEnums.TargetType.SINGLE_ENEMY, 4,2),
+				AF.effect(GlobalEnums.TargetType.SINGLE_ENEMY, EffectLibrary.vulnerable(2),1),
+				AF.effect(GlobalEnums.TargetType.SELF, EffectLibrary.poison(1)),
+				], false, true, 4)),
+		], 
+		0,
+		GlobalEnums.CardType.FIELD
+	))
+	
+	all_cards.append(_card("Summon Plague Engine",
+		3,
+		GlobalEnums.CardColor.PURPLE,
+		GlobalEnums.CardRarity.RARE,
+		[
+			AF.summon(GlobalEnums.TargetType.SUMMON_ALLY,
+			_summon("Plague Engine", 14, [
+				AF.effect(GlobalEnums.TargetType.ALL_ENEMIES, EffectLibrary.weak(1),1),
+				AF.effect(GlobalEnums.TargetType.ALL_ENEMIES, EffectLibrary.bleed(2),1),
+				], false, true, 4)),
+		], 
+		0,
+		GlobalEnums.CardType.FIELD
+	))
+	
+	all_cards.append(_card("Summon Desecrator",
+		3,
+		GlobalEnums.CardColor.PURPLE,
+		GlobalEnums.CardRarity.RARE,
+		[
+			AF.summon(GlobalEnums.TargetType.SUMMON_ALLY,
+			_summon("Desecrator", 10, [
+				AF.damage(GlobalEnums.TargetType.ALL_ENEMIES, 4,2),
+				AF.effect(GlobalEnums.TargetType.ALL_ENEMIES, EffectLibrary.vulnerable(2),1),
+				], false, true, 4)),
+		], 
+		0,
+		GlobalEnums.CardType.FIELD
+	))
+	
+	all_cards.append(_card("Summon The Withered",
+		2,
+		GlobalEnums.CardColor.PURPLE,
+		GlobalEnums.CardRarity.RARE,
+		[
+			AF.summon(GlobalEnums.TargetType.SUMMON_ALLY,
+			_summon("The Withered", 16, [
+				AF.damage(GlobalEnums.TargetType.SINGLE_ENEMY, 6,3),
+				AF.effect(GlobalEnums.TargetType.SINGLE_ENEMY, EffectLibrary.weak(2),1),
+				AF.effect(GlobalEnums.TargetType.SELF, EffectLibrary.bleed(2),1),
+				], false, false, 5)),
+		], 
+		0,
+		GlobalEnums.CardType.FIELD
+	))
+	
+	all_cards.append(_card("Summon Abyssal Anchor",
+		3,
+		GlobalEnums.CardColor.PURPLE,
+		GlobalEnums.CardRarity.RARE,
+		[
+			AF.summon(GlobalEnums.TargetType.SUMMON_ALLY,
+			_summon("Abyssal Anchor", 14, [
+				AF.effect(GlobalEnums.TargetType.ALL_ENEMIES, EffectLibrary.vulnerable(2),1),
+				AF.effect(GlobalEnums.TargetType.ALL_ENEMIES, EffectLibrary.weak(2),1),
+				], false, true, 5)),
+		], 
+		0,
+		GlobalEnums.CardType.FIELD
+	))
+	
+	all_cards.append(_card("Summon The Unraveling",
+		4,
+		GlobalEnums.CardColor.PURPLE,
+		GlobalEnums.CardRarity.LEGENDARY,
+		[
+			AF.summon(GlobalEnums.TargetType.SUMMON_ALLY,
+			_summon("The Unraveling", 12, [
+				AF.damage(GlobalEnums.TargetType.ALL_ENEMIES, 6,2),
+				AF.effect(GlobalEnums.TargetType.ALL_ENEMIES, EffectLibrary.bleed(3),1),
+				AF.effect(GlobalEnums.TargetType.ALL_ENEMIES, EffectLibrary.vulnerable(3),1),
+				AF.effect(GlobalEnums.TargetType.ALL_ENEMIES, EffectLibrary.weak(2),1),
+				], false, true, 5)),
+		], 
+		0,
+		GlobalEnums.CardType.FIELD
+	))
+	
+	all_cards.append(_card("Summon Void Incarnate",
+		5,
+		GlobalEnums.CardColor.PURPLE,
+		GlobalEnums.CardRarity.LEGENDARY,
+		[
+			AF.summon(GlobalEnums.TargetType.SUMMON_ALLY,
+			_summon("Void Incarnate", 18, [
+				AF.damage(GlobalEnums.TargetType.ALL_ENEMIES, 6,2),
+				AF.effect(GlobalEnums.TargetType.ALL_ENEMIES, EffectLibrary.bleed(4),1),
+				AF.effect(GlobalEnums.TargetType.ALL_ENEMIES, EffectLibrary.vulnerable(4),1),
+				AF.effect(GlobalEnums.TargetType.ALL_ENEMIES, EffectLibrary.weak(3),1),
+				AF.effect(GlobalEnums.TargetType.SELF, EffectLibrary.bleed(3)),
+				], false, true, 6)),
+		], 
+		0,
+		GlobalEnums.CardType.FIELD
+	))
+	
 
 
-func _summon(_name:String = "", hp:int= 1, actions:Array[CombatAction] = [], takes_aggro:bool = false, is_passive:bool=false)->SummonData:
+func _summon(_name:String = "", hp:int= 1, actions:Array[CombatAction] = [], takes_aggro:bool = false, is_passive:bool=false, hp_up = 0,returned_on_death:bool=true)->SummonData:
 	var summon:SummonData = SummonData.new()
 	summon.actions = actions
 	summon.summon_name = _name
 	summon.takes_aggro = takes_aggro
 	summon.is_passive = is_passive
 	summon.summon_max_hp = hp
+	summon.summon_max_hp_up = hp_up
+	summon.returned_on_death= returned_on_death
 	return summon
 
 static var _next_uid: int = 0

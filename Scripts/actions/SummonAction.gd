@@ -7,3 +7,4 @@ func upgrade():
 	for action in summon_data.actions:
 		action.upgrade()
 	summon_data.summon_name += "+"
+	

@@ -16,5 +16,6 @@ func _on_quit_button_pressed() -> void:
 
 func _on_continue_button_pressed() -> void:
 	RunState.open_top_bar(get_tree().root)
+	RunState.rng.set_state(RunState.rng_state)
 	if RunState.current_scene_path() != "":
 		get_tree().change_scene_to_file(RunState.current_scene_path())

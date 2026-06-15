@@ -15,7 +15,7 @@ var card_draw:int = GlobalConstants.CARD_DRAW
 var current_floor:int = 0
 var relics: Array = [] # set up to be an array of Relics TODO
 var rng := RandomNumberGenerator.new()
-
+var rng_state = rng.get_state()
 
 # Offerings Data
 var max_accepted_cards:int = 1
@@ -35,6 +35,11 @@ var upgrades_available: int = 0
 var ui_locked: bool = false
 var choices_per_rest: int = 1
 
+#Shop stuff
+var shop_generated:bool = false
+var shop_cards:Array[CardData]= []
+var shop_relics:Array[RelicData] = []
+
 #TODO Relic / Effect Connections###
 var card_energy_reduction: int = 0
 var damage_reduction: int = 0
@@ -51,6 +56,7 @@ var weak_on_play: bool = false
 var escape_viewer: CanvasLayer = null
 var map_viewer: Node2D = null
 var top_bar: CanvasLayer = null
+
 
 func open_top_bar(parent: Node) -> void:
 	if top_bar != null:
@@ -162,10 +168,10 @@ func new_run(run_seed: int = randi()) -> void:
 	_create_map()
 	_generate_starting_deck()
 
+
 func _create_map():
 	map_data = MapData.new()
 	map_data.generate(rng)
-
 func _generate_starting_deck():
 	var strike = CardLibrary.all_cards[0]
 	var defend = CardLibrary.all_cards[1]

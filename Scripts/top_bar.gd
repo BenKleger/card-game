@@ -22,6 +22,7 @@ func update_display() -> void:
 	gold_label.text = "Gold: " + str(RunState.gold)
 	map_button.disabled = RunState.current_scene_path() == "res://Scenes/MapManager.tscn"
 	_update_relics_display()
+	hp_label.text = str(RunState.current_hp)+"/"+str(RunState.max_hp)
 
 func _update_relics_display() -> void:
 	for child in relics_container.get_children():

@@ -21,28 +21,63 @@ anchor_bottom = 0.8
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="CardContainer" type="HBoxContainer" parent="Rewards"]
+[node name="slot4" type="Control" parent="Rewards"]
 layout_mode = 2
+size_flags_horizontal = 5
+size_flags_vertical = 3
+
+[node name="CardContainer" type="HBoxContainer" parent="Rewards/slot4"]
+layout_mode = 0
+offset_top = -165.0
+offset_right = 960.0
+offset_bottom = -165.0
 size_flags_horizontal = 5
 size_flags_vertical = 6
 alignment = 1
 
-[node name="GoldButton" type="Button" parent="Rewards"]
+[node name="slot" type="Control" parent="Rewards"]
 layout_mode = 2
+size_flags_horizontal = 5
+size_flags_vertical = 3
+
+[node name="GoldButton" type="Button" parent="Rewards/slot"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 0
+offset_top = 44.0
+offset_right = 960.0
+offset_bottom = 94.0
 size_flags_horizontal = 5
 size_flags_vertical = 6
 
-[node name="RelicButton" type="Button" parent="Rewards"]
+[node name="slot2" type="Control" parent="Rewards"]
 layout_mode = 2
+size_flags_horizontal = 5
+size_flags_vertical = 3
+
+[node name="RelicButton" type="Button" parent="Rewards/slot2"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 0
+offset_top = 66.0
+offset_right = 960.0
+offset_bottom = 116.0
 size_flags_horizontal = 5
 size_flags_vertical = 6
 
-[node name="MapButton" type="Button" parent="Rewards"]
+[node name="slot3" type="Control" parent="Rewards"]
 layout_mode = 2
+size_flags_horizontal = 5
+size_flags_vertical = 3
+
+[node name="MapButton" type="Button" parent="Rewards/slot3"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 0
+offset_top = 110.0
+offset_right = 960.0
+offset_bottom = 160.0
 size_flags_horizontal = 5
 size_flags_vertical = 6
 text = "Mappy Bo Bappy"
 
-[connection signal="pressed" from="Rewards/GoldButton" to="." method="_on_gold_button_pressed"]
-[connection signal="pressed" from="Rewards/RelicButton" to="." method="_on_relic_button_pressed"]
-[connection signal="pressed" from="Rewards/MapButton" to="." method="_on_map_button_pressed"]
+[connection signal="pressed" from="Rewards/slot/GoldButton" to="." method="_on_gold_button_pressed"]
+[connection signal="pressed" from="Rewards/slot2/RelicButton" to="." method="_on_relic_button_pressed"]
+[connection signal="pressed" from="Rewards/slot3/MapButton" to="." method="_on_map_button_pressed"]
