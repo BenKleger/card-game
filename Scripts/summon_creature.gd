@@ -73,11 +73,23 @@ func _effect_color(effect: Effect) -> Color:
 		_: return Color(0.8, 0.8, 0.8)
 
 
+@onready var color_rect: ColorRect = $ColorRect
 func update_stats() -> void:
 	hp_label.text = str(current_hp)+"/"+str(max_hp)
 	block_label.text = str(block)
 	name_label.text = summon_data.summon_name if summon_data else ""
 	_update_effects_display()
+	match source_card.color:
+		GlobalEnums.CardColor.RED:
+			color_rect.color = Color("#7A4545")
+		GlobalEnums.CardColor.BLUE:
+			color_rect.color = Color("#455E7A")
+		GlobalEnums.CardColor.PURPLE:
+			color_rect.color = Color("#65457A")
+		GlobalEnums.CardColor.GREEN:
+			color_rect.color = Color("#4C704C")
+		_:
+			color_rect.color = Color("#606060")
 
 signal clicked(summon: SummonCreature)
 

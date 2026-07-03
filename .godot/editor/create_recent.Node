@@ -1,6 +1,7 @@
+Panel
+Node
 CenterContainer
 Control
-Panel
 GridContainer
 Label
 HBoxContainer
@@ -11,4 +12,3 @@ Card
 CanvasLayer
 ColorRect
 GridMap
-ScrollContainer

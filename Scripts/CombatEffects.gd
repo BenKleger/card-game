@@ -67,6 +67,7 @@ static func execute_action(
 	
 	else:
 		print("WTF?")
+		print(action)
 
 static func attack_target(damage:int, target:Node, source: Node)->void:
 	#Str

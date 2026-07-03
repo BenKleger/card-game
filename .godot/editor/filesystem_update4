@@ -1,8 +1,0 @@
-res://Scenes/TopBar.tscn
-res://Scripts/top_bar.gd
-res://data/effects/BleedEffect.gd
-res://Scenes/Card.tscn
-res://Scenes/RewardManager.tscn
-res://Scripts/reward_manager.gd
-res://Scenes/Shop.tscn
-res://Scripts/shop.gd

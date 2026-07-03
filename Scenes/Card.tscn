@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://c7uo2fju3o1ra"]
+[gd_scene load_steps=3 format=3 uid="uid://c7uo2fju3o1ra"]
 
 [ext_resource type="Script" uid="uid://c8admblqsa4tr" path="res://Scripts/card.gd" id="1_pnb5n"]
+[ext_resource type="StyleBox" uid="uid://q85lknrtp25w" path="res://assets/cardborders/CommonCardBorder.tres" id="2_3p273"]
 
 [node name="Card" type="Control"]
 custom_minimum_size = Vector2(150, 240)
@@ -21,30 +22,42 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.5137255, 0.23137255, 0.8901961, 1)
 
-[node name="Container" type="VBoxContainer" parent="."]
+[node name="BorderPanel" type="Panel" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_styles/panel = ExtResource("2_3p273")
 
-[node name="Costs" type="HBoxContainer" parent="Container"]
+[node name="Container" type="VBoxContainer" parent="BorderPanel"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.05
+anchor_top = 0.02
+anchor_right = 0.95
+anchor_bottom = 0.95
+offset_bottom = 39.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Costs" type="HBoxContainer" parent="BorderPanel/Container"]
 layout_mode = 2
 
-[node name="CoinCost" type="Label" parent="Container/Costs"]
+[node name="CoinCost" type="Label" parent="BorderPanel/Container/Costs"]
 layout_mode = 2
 size_flags_horizontal = 2
 theme_override_colors/font_color = Color(0.88858086, 0.84784365, 0, 1)
 text = "1"
 
-[node name="EnergyCost" type="Label" parent="Container/Costs"]
+[node name="EnergyCost" type="Label" parent="BorderPanel/Container/Costs"]
 layout_mode = 2
 size_flags_horizontal = 10
 theme_override_colors/font_color = Color(0, 0.7764706, 1, 1)
 text = "1"
 
-[node name="NameLabel" type="Label" parent="Container"]
+[node name="NameLabel" type="Label" parent="BorderPanel/Container"]
 custom_minimum_size = Vector2(10, 10)
 layout_mode = 2
 size_flags_vertical = 1
@@ -53,7 +66,7 @@ text = "atk"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="Description" type="Label" parent="Container"]
+[node name="Description" type="Label" parent="BorderPanel/Container"]
 custom_minimum_size = Vector2(25, 25)
 layout_mode = 2
 size_flags_vertical = 7

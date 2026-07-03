@@ -199,7 +199,9 @@ func _build_cards() -> void: #TODO Overhaul to also accept upgrades
 		[
 			AF.block(GlobalEnums.TargetType.SELF, 20, 6),
 			AF.effect(GlobalEnums.TargetType.SELF, EffectLibrary.regen(4),2),
-		]
+		],
+		0,
+		GlobalEnums.CardType.TEMPORARY
 	))
 	
 	## --- GREEN cards — draw, energy, tempo ---
@@ -501,7 +503,7 @@ func _build_cards() -> void: #TODO Overhaul to also accept upgrades
 				AF.effect(GlobalEnums.TargetType.SINGLE_ENEMY, EffectLibrary.bleed(3),2),
 				AF.effect(GlobalEnums.TargetType.SINGLE_ENEMY, EffectLibrary.weak(2),1),
 				AF.effect(GlobalEnums.TargetType.SELF, EffectLibrary.regen(5),2),
-				], false, false)),
+				], false, false, 4)),
 		], 
 		1,
 		GlobalEnums.CardType.FIELD
@@ -546,7 +548,7 @@ func _build_cards() -> void: #TODO Overhaul to also accept upgrades
 			_summon("Sutured Guard", 6, [
 				AF.block(GlobalEnums.TargetType.SINGLE_ALLY, 3,1),
 				AF.effect(GlobalEnums.TargetType.SINGLE_ALLY, EffectLibrary.regen(1), 1),
-				], true, false)),
+				], true, false, 1)),
 		], 
 		0,
 		GlobalEnums.CardType.FIELD
@@ -619,7 +621,7 @@ func _build_cards() -> void: #TODO Overhaul to also accept upgrades
 			_summon("Grave Bulwark", 8, [
 				AF.effect(GlobalEnums.TargetType.SINGLE_ALLY, EffectLibrary.regen(2), 1),
 				AF.block(GlobalEnums.TargetType.SINGLE_ALLY, 8,3),
-				], false, true)),
+				], false, true, 2, false)),
 		], 
 		0,
 		GlobalEnums.CardType.FIELD
@@ -633,7 +635,7 @@ func _build_cards() -> void: #TODO Overhaul to also accept upgrades
 			_summon("The Last Rampart", 20, [
 				AF.effect(GlobalEnums.TargetType.SINGLE_ALLY, EffectLibrary.regen(3), 1),
 				AF.block(GlobalEnums.TargetType.SINGLE_ALLY, 18,4),
-				], false, true)),
+				], false, true, 4, false)),
 		], 
 		0,
 		GlobalEnums.CardType.FIELD
@@ -648,7 +650,7 @@ func _build_cards() -> void: #TODO Overhaul to also accept upgrades
 			_summon("Deathless Warden", 28, [
 				AF.effect(GlobalEnums.TargetType.SINGLE_ALLY, EffectLibrary.regen(4), 2),
 				AF.block(GlobalEnums.TargetType.SINGLE_ALLY, 24,6),
-				], false, true)),
+				], false, true, 5, false)) 
 		], 
 		0,
 		GlobalEnums.CardType.FIELD

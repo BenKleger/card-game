@@ -58,6 +58,9 @@ var map_viewer: Node2D = null
 var top_bar: CanvasLayer = null
 
 
+func window_changed():
+	pass
+
 func open_top_bar(parent: Node) -> void:
 	if top_bar != null:
 		return

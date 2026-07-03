@@ -168,6 +168,10 @@ func _try_auto_execute() -> void:
 			_clear_selection()
 
 func on_card_played(card: CardData) -> void:
+	for color in color_chains:
+		if card.color != color:
+			color_chains[color] = 0
+	
 	if card.color in color_chains:
 		color_chains[card.color] += 1
 	update_hand_chain_displays()
@@ -220,7 +224,7 @@ func _on_summon_clicked(summon: SummonCreature) -> void:
 		if get_required_targets(selected_source).ally:
 			ally_target = summon
 			_try_auto_execute()
-		return
+			return
 	# nothing selected — clicking own summon triggers ITS action via the same system
 	if phase != Phase.PLAYER_TURN or summon.used_this_turn:
 		return
@@ -673,11 +677,7 @@ func _get_move_targets(action: CombatAction, enemy) -> Array[Node]:
 				for summon in tank_summons:
 					targets.append(summon)
 		GlobalEnums.TargetType.PLAYER:
-			var tank_summon :SummonCreature= _get_first_alive_in_column(SummonColumn.TANK)
-			if !tank_summon:
-				targets = [player]
-			else:
-				targets=[tank_summon]
+			targets = [player]
 		GlobalEnums.TargetType.SINGLE_ALLY:
 			#TODO
 			targets = [enemy]
